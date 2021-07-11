@@ -13,8 +13,7 @@ def index():
 
 @app.route("/svd/example")
 def example():
-    image = ImageSVD("beav.png")
-    image_array = image.get_reduced_image(630);
+    image = ImageSVD("tapir_sad.jpg")
+    image_array = image.get_reduced_image(3);
     image_list = image_array.tolist()
-    json_str = json.dumps(image_list)
-    return {"colors": json_str}
+    return {"colors": image_list, "shape": image_array.shape}
