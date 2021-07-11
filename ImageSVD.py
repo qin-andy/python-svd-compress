@@ -16,7 +16,7 @@ class ImageSVD:
     def get_reduced_image(self, reduction):
         rgb2 = np.stack((self.r.reduce(reduction), self.g.reduce(reduction), self.b.reduce(reduction)), 2)
         rgb2 = rgb2.astype(np.uint8)
-        return Image.fromarray(rgb2)
+        return rgb2
 
 
 class ColorSVD:

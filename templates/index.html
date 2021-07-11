@@ -5,7 +5,10 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="index.js"></script>
+  <script src="{{ url_for('static', filename='index.js') }}"></script>
+
+  <link rel="stylesheet" href="../static/bootstrap.min.css">
+  <link rel="stylesheet" href="../static/styles.css">
   <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
@@ -13,7 +16,10 @@
 <body>
   <div class="container align-items-center justify-content-center d-flex flex-column h-100">
     <div class="row justify-content-center w-100">
-      <h1 class="m-5">Web SVD Compress</h1>
+      <div class="col d-flex align-items-center flex-column">
+        <h1 class="m-5">Web SVD Compress</h1>
+        <canvas id="canvas"></canvas>
+      </div>
     </div>
   </div>
 </body>
