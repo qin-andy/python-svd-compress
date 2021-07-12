@@ -14,11 +14,18 @@
 </head>
 
 <body>
-  <div class="container align-items-center justify-content-center d-flex flex-column h-100">
+  <div class="container align-items-center d-flex flex-column h-100">
     <div class="row justify-content-center w-100">
       <div class="col d-flex align-items-center flex-column">
         <h1 class="m-5">Web SVD Compress</h1>
         <canvas id="canvas"></canvas>
+        <form id="image-upload" class="d-flex flex-column align-items-center">
+          <div class="custom-file m-3">
+            <input id="file-input" type="file" class="custom-file-input" accept=".png,.jpg" id="customFile">
+            <label id="file-label" class="custom-file-label" for="customFile">Choose file</label>
+          </div>
+          <button class="btn btn-primary">Upload</button>
+        </form>
       </div>
     </div>
   </div>

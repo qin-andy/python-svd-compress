@@ -1,7 +1,7 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from markupsafe import escape
 from ImageSVD import ImageSVD
-import json
+
 
 app = Flask(__name__)
 
@@ -17,3 +17,13 @@ def example():
     image_array = image.get_reduced_image(3);
     image_list = image_array.tolist()
     return {"colors": image_list, "shape": image_array.shape}
+
+
+@app.route("/upload/image", methods=['GET', 'POST'])
+def upload():
+    if request.method == 'POST':
+        data = request.form
+        print(data)
+        return "<p>Something happened</p>"
+    else:
+        return "<p>Image uploading endpoint</p>"
