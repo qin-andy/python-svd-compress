@@ -47,8 +47,17 @@ function renderImageOnCanvas(img) {
   canvas.height = img.height;
   ctx.drawImage(img, 0, 0);
   let imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-}
 
+  let formData = new FormData();
+  formData.append("data", imgData.data);
+  formData.append("width", canvas.width);
+  formData.append("height", canvas.height);
+  fetch('/upload/image', { method: "POST", body: formData })
+    .then(statusCheck)
+    .then(res => res.json())
+    .then((json) => renderRGBOnCanvas(json.colors, json.shape[0], json.shape[1]))
+    .catch(console.log)
+}
 
 function renderRGBOnCanvas(rgb, height, width) {
   let canvas = document.getElementById("canvas");
@@ -58,7 +67,6 @@ function renderRGBOnCanvas(rgb, height, width) {
 
   let imgData = new ImageData(width, height);
   let data = imgData.data;
-  let count = 0;
   let index = 0;
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
