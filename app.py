@@ -1,10 +1,12 @@
 from PIL import Image
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, session
 from markupsafe import escape
 from ImageSVD import ImageSVD
 
 
 app = Flask(__name__)
+secret_file = open("secret_key.txt");
+app.secret_key = secret_file.read()
 
 
 @app.route("/")
@@ -30,7 +32,12 @@ def upload():
         rgb_list = rgb.tolist()
         print("post result shape: " + str(rgb.shape))
         return {"colors": rgb_list, "shape": rgb.shape}
-
-
     else:
         return "<p>Image uploading endpoint</p>"
+
+@app.route("/session")
+def count():
+    if 'count' not in session:
+        session['count'] = 0
+    session['count'] += 1
+    return str(session['count'])

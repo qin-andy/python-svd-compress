@@ -47,7 +47,7 @@ function handleFileChange(e) {
     img.addEventListener("load", () => renderImageOnCanvas(img));
   } else {
     id("upload-btn").disabled = true;
-    label.textContet = "Choose file";
+    label.textContent = "Choose file";
   }
 }
 

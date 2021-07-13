@@ -42,3 +42,4 @@ venv.bak/
 .idea/
 *.png
 *.jpg
+secret_key.txt
