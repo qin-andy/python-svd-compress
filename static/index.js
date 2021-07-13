@@ -10,7 +10,7 @@ function init() {
     console.log(index);
     disableUiElements();
     id("upload-spinner").classList.remove("d-none");
-    fetch("/svd/example/" + index)
+    fetch("/svd/example/" + index + "?svs=50")
       .then(statusCheck)
       .then(res => res.json())
       .then((json) => renderRGBOnCanvas(json.colors, json.shape[0], json.shape[1]))
@@ -103,7 +103,6 @@ function disableUiElements() {
 
 function enableUiElements() {
   id("file-input").disabled = false;
-  id("upload-btn").disabled = false;
   document.querySelectorAll(".gallery").forEach(element => {
     element.classList.add("enabled")
   });

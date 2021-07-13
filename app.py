@@ -23,13 +23,24 @@ def index():
 
 @app.route("/svd/example/<index>")
 def example(index):
+    svs = request.args.get("svs");
+    if svs == None:
+        svs = 10
+    elif not svs.isnumeric():
+        return "Invalid singular values count!", 400
+    svs = int(svs)
+
     if not index.isnumeric():
         return "Invalid index!", 400
+
     index = int(index)
     if (index >= 0) and (index < len(examples)):
         svd = examples[index]
-        rgb = svd.get_reduced_image(10);
+        if svs > min(svd.width, svd.height):
+            return "Singular values cannot exceed image size: " + str(svd.width) + "x" + str(svd.height), 400
+        rgb = svd.get_reduced_image(svs);
         rgb_list = rgb.tolist()
+        print("Request fulfilled")
         return {"colors": rgb_list, "shape": rgb.shape}
     else:
         return "Image not found!", 400
@@ -37,11 +48,18 @@ def example(index):
 
 @app.route("/upload/image", methods=['GET', 'POST'])
 def upload():
+    svs = request.args.get("svs");
+    if svs == None:
+        svs = 10
+    elif not svs.isnumeric():
+        return "Invalid singular values count!", 400
+    svs = int(svs)
+
     if request.method == 'POST':
         data = request.form
         arr = data["data"].split(",")
         svd = ImageSVD(arr, int(data["width"]), int(data["height"]))
-        rgb = svd.get_reduced_image(20)
+        rgb = svd.get_reduced_image(svs)
         rgb_list = rgb.tolist()
         print("post result shape: " + str(rgb.shape))
         return {"colors": rgb_list, "shape": rgb.shape}
