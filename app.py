@@ -9,9 +9,9 @@ secret_file = open("secret_key.txt");
 app.secret_key = secret_file.read()
 
 examples = [
-    ImageSVD("static/images/horizon.png"),
-    ImageSVD("static/images/city.png"),
     ImageSVD("static/images/bridge.png"),
+    ImageSVD("static/images/city.png"),
+    ImageSVD("static/images/horizon.png"),
     ImageSVD("static/images/shore.png")
 ]
 
@@ -27,7 +27,7 @@ def example(index):
         return "Invalid index!", 400
     index = int(index)
     if (index >= 0) and (index < len(examples)):
-        svd = examples[0]
+        svd = examples[index]
         rgb = svd.get_reduced_image(10);
         rgb_list = rgb.tolist()
         return {"colors": rgb_list, "shape": rgb.shape}

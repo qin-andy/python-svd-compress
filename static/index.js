@@ -5,16 +5,26 @@ function init() {
   id("upload-btn").disabled = true;
   id("file-input").addEventListener("change", handleFileChange);
   id("image-upload").addEventListener("submit", handleSubmit);
-  // fetch("/svd/example/1")
-  //   .then(statusCheck)
-  //   .then(res => res.json())
-  //   .then((json) => renderRGBOnCanvas(json.colors, json.shape[0], json.shape[1]))
-  //   .catch(console.log);
+  document.querySelectorAll(".gallery").forEach(element => element.addEventListener("click", () => {
+    let index = element.id.split("-")[1];
+    console.log(index);
+    disableUiElements();
+    id("upload-spinner").classList.remove("d-none");
+    fetch("/svd/example/" + index)
+      .then(statusCheck)
+      .then(res => res.json())
+      .then((json) => renderRGBOnCanvas(json.colors, json.shape[0], json.shape[1]))
+      .catch(console.log)
+      .finally(() => {
+        id("upload-spinner").classList.add("d-none");
+        enableUiElements();
+      });
+  }));
 }
 
 function handleSubmit(e) {
   e.preventDefault();
-  id("upload-btn").disabled = true;
+  disableUiElements();
   id("upload-spinner").classList.remove("d-none");
   let file = id("file-input").files[0];
   if (file) {
@@ -31,7 +41,10 @@ function handleSubmit(e) {
       .then(res => res.json())
       .then((json) => renderRGBOnCanvas(json.colors, json.shape[0], json.shape[1]))
       .catch(console.log)
-      .finally(() => id("upload-spinner").classList.add("d-none"))
+      .finally(() => {
+        id("upload-spinner").classList.add("d-none");
+        enableUiElements();
+      });
   } else {
     console.log("Missing file!");
   }
@@ -78,6 +91,22 @@ function renderRGBOnCanvas(rgb, height, width) {
     }
   }
   ctx.putImageData(imgData, 0, 0);
+}
+
+function disableUiElements() {
+  id("file-input").disabled = true;
+  id("upload-btn").disabled = true;
+  document.querySelectorAll(".gallery").forEach(element => {
+    element.classList.remove("enabled")
+  });
+}
+
+function enableUiElements() {
+  id("file-input").disabled = false;
+  id("upload-btn").disabled = false;
+  document.querySelectorAll(".gallery").forEach(element => {
+    element.classList.add("enabled")
+  });
 }
 
 async function statusCheck(response) {

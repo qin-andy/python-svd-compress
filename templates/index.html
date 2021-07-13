@@ -22,10 +22,14 @@
           <p>Something went wrong!</p>
         </canvas>
         <div class="m-3 d-flex flex-row">
-            <img class="m-1 img-fluid gallery rounded enabled" src="{{ url_for('static', filename='images/bridge.png') }}" alt="Card image cap">
-            <img class="m-1 img-fluid gallery rounded enabled" src="{{ url_for('static', filename='images/city.png') }}" alt="Card image cap">
-            <img class="m-1 img-fluid gallery rounded enabled" src="{{ url_for('static', filename='images/horizon.png') }}" alt="Card image cap">
-            <img class="m-1 img-fluid gallery rounded" src="{{ url_for('static', filename='images/shore.png') }}" alt="Card image cap">
+          <img class="m-1 img-fluid gallery rounded enabled" id="example-0"
+            src="{{ url_for('static', filename='images/bridge.png') }}" alt="Card image cap">
+          <img class="m-1 img-fluid gallery rounded enabled" id="example-1"
+            src="{{ url_for('static', filename='images/city.png') }}" alt="Card image cap">
+          <img class="m-1 img-fluid gallery rounded enabled" id="example-2"
+            src="{{ url_for('static', filename='images/horizon.png') }}" alt="Card image cap">
+          <img class="m-1 img-fluid gallery rounded" id="example-3"
+            src="{{ url_for('static', filename='images/shore.png') }}" alt="Card image cap">
         </div>
         <form id="image-upload" class="d-flex flex-column align-items-center">
           <div class="custom-file m-3">
