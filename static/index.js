@@ -5,7 +5,7 @@ function init() {
   id("upload-btn").disabled = true;
   id("file-input").addEventListener("change", handleFileChange);
   id("image-upload").addEventListener("submit", handleSubmit);
-  // fetch("/svd/example")
+  // fetch("/svd/example/1")
   //   .then(statusCheck)
   //   .then(res => res.json())
   //   .then((json) => renderRGBOnCanvas(json.colors, json.shape[0], json.shape[1]))

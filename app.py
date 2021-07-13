@@ -8,18 +8,31 @@ app = Flask(__name__)
 secret_file = open("secret_key.txt");
 app.secret_key = secret_file.read()
 
+examples = [
+    ImageSVD("static/images/horizon.png"),
+    ImageSVD("static/images/city.png"),
+    ImageSVD("static/images/bridge.png"),
+    ImageSVD("static/images/shore.png")
+]
+
 
 @app.route("/")
 def index():
     return render_template("index.html")
 
 
-@app.route("/svd/example")
-def example():
-    svd = ImageSVD("tapir_sad.jpg")
-    rgb = svd.get_reduced_image(3);
-    rgb_list = rgb.tolist()
-    return {"colors": rgb_list, "shape": rgb.shape}
+@app.route("/svd/example/<index>")
+def example(index):
+    if not index.isnumeric():
+        return "Invalid index!", 400
+    index = int(index)
+    if (index >= 0) and (index < len(examples)):
+        svd = examples[0]
+        rgb = svd.get_reduced_image(10);
+        rgb_list = rgb.tolist()
+        return {"colors": rgb_list, "shape": rgb.shape}
+    else:
+        return "Image not found!", 400
 
 
 @app.route("/upload/image", methods=['GET', 'POST'])

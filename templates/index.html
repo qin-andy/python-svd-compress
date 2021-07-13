@@ -21,6 +21,12 @@
         <canvas id="canvas" class="shadow-lg" width="600" height="400">
           <p>Something went wrong!</p>
         </canvas>
+        <div class="m-3 d-flex flex-row">
+            <img class="m-1 img-fluid gallery rounded enabled" src="{{ url_for('static', filename='images/bridge.png') }}" alt="Card image cap">
+            <img class="m-1 img-fluid gallery rounded enabled" src="{{ url_for('static', filename='images/city.png') }}" alt="Card image cap">
+            <img class="m-1 img-fluid gallery rounded enabled" src="{{ url_for('static', filename='images/horizon.png') }}" alt="Card image cap">
+            <img class="m-1 img-fluid gallery rounded" src="{{ url_for('static', filename='images/shore.png') }}" alt="Card image cap">
+        </div>
         <form id="image-upload" class="d-flex flex-column align-items-center">
           <div class="custom-file m-3">
             <input id="file-input" type="file" class="custom-file-input" accept=".png,.jpg" id="customFile">
@@ -31,6 +37,10 @@
             Upload
           </button>
         </form>
+      </div>
+    </div>
+    <div class="row px-5 justify-content-center w-100">
+      <div class="col-lg-5 d-flex align-items-center flex-column">
         <hr class="w-75" />
         <h4>Info</h4>
       </div>
