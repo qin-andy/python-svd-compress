@@ -21,32 +21,51 @@
         <canvas id="canvas" class="shadow-lg" width="600" height="400">
           <p>Something went wrong!</p>
         </canvas>
-        <div class="m-3 d-flex flex-row">
+        <div class="m-3 d-flex justify-content-center flex-row">
           <img class="m-1 img-fluid gallery rounded enabled" id="example-0"
             src="{{ url_for('static', filename='images/bridge.png') }}" alt="Card image cap">
           <img class="m-1 img-fluid gallery rounded enabled" id="example-1"
             src="{{ url_for('static', filename='images/city.png') }}" alt="Card image cap">
           <img class="m-1 img-fluid gallery rounded enabled" id="example-2"
             src="{{ url_for('static', filename='images/horizon.png') }}" alt="Card image cap">
-          <img class="m-1 img-fluid gallery rounded" id="example-3"
+          <img class="m-1 img-fluid gallery rounded enabled" id="example-3"
             src="{{ url_for('static', filename='images/shore.png') }}" alt="Card image cap">
         </div>
+        <h5 class="m-0">Singular Values</h5>
+        <input type="range" value="10" class="w-75" min="1" max="150" id="sv-slider">
+        <p id="sv-display" class="m-0">10</p>
+        <hr class="w-75" />
+        <h4>Custom Image</h4>
         <form id="image-upload" class="d-flex flex-column align-items-center">
           <div class="custom-file m-3">
             <input id="file-input" type="file" class="custom-file-input" accept=".png,.jpg" id="customFile">
             <label id="file-label" class="custom-file-label" for="customFile">Choose file</label>
           </div>
+
           <button id="upload-btn" class="btn btn-primary-outline border-primary">
             <span id="upload-spinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
-            Upload
+            Calculate
           </button>
         </form>
+        <button id="recalc-btn" class="d-none btn btn-primary-outline border-primary">Recalculate</button>
+      </div>
+    </div>
+    <div id="details-box" class="d-none row px-5 justify-content-center w-100">
+      <div class="col-lg-5 d-flex align-items-center flex-column">
+        <hr class="w-75" />
+        <h4>Details</h4>
+
+        <p>Singular Values</p>
+        <p>Original size in pixel values</p>
+        <p>Compressed size in pixel values</p>
+        <p>Pixels saved</p>
+        <p>Compression Ratio</p>
       </div>
     </div>
     <div class="row px-5 justify-content-center w-100">
       <div class="col-lg-5 d-flex align-items-center flex-column">
         <hr class="w-75" />
-        <h4>Info</h4>
+        <h4>About the SVD</h4>
       </div>
     </div>
     <div class="row px-5 justify-content-center w-100">

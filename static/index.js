@@ -1,16 +1,20 @@
 window.addEventListener("load", init);
 
+const order = ["bridge", "city", "horizon", "shore"];
+
 function init() {
   console.log("Window loaded!");
   id("upload-btn").disabled = true;
   id("file-input").addEventListener("change", handleFileChange);
   id("image-upload").addEventListener("submit", handleSubmit);
+  id("sv-slider").addEventListener("change", handleSliderChange);
   document.querySelectorAll(".gallery").forEach(element => element.addEventListener("click", () => {
     let index = element.id.split("-")[1];
-    console.log(index);
     disableUiElements();
     id("upload-spinner").classList.remove("d-none");
-    fetch("/svd/example/" + index + "?svs=50")
+    let svs = id("sv-slider").value;
+    console.log(svs)
+    fetch("/svd/example/" + index + "?svs=" + svs)
       .then(statusCheck)
       .then(res => res.json())
       .then((json) => renderRGBOnCanvas(json.colors, json.shape[0], json.shape[1]))
@@ -20,6 +24,10 @@ function init() {
         enableUiElements();
       });
   }));
+}
+
+function handleSliderChange(e) {
+  id("sv-display").textContent = e.target.value;
 }
 
 function handleSubmit(e) {
@@ -35,8 +43,9 @@ function handleSubmit(e) {
     formData.append("data", imgData.data);
     formData.append("width", canvas.width);
     formData.append("height", canvas.height);
+    query = "?svs=" + id("sv-slider").value;
 
-    fetch('/upload/image', { method: "POST", body: formData })
+    fetch('/upload/image' + query, { method: "POST", body: formData })
       .then(statusCheck)
       .then(res => res.json())
       .then((json) => renderRGBOnCanvas(json.colors, json.shape[0], json.shape[1]))
@@ -94,6 +103,7 @@ function renderRGBOnCanvas(rgb, height, width) {
 }
 
 function disableUiElements() {
+  id("sv-slider").disabled = true;
   id("file-input").disabled = true;
   id("upload-btn").disabled = true;
   document.querySelectorAll(".gallery").forEach(element => {
@@ -102,6 +112,7 @@ function disableUiElements() {
 }
 
 function enableUiElements() {
+  id("sv-slider").disabled = false;
   id("file-input").disabled = false;
   document.querySelectorAll(".gallery").forEach(element => {
     element.classList.add("enabled")
