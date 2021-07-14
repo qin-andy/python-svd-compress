@@ -50,16 +50,15 @@
         <button id="recalc-btn" class="d-none btn btn-primary-outline border-primary">Recalculate</button>
       </div>
     </div>
-    <div id="details-box" class="d-none row px-5 justify-content-center w-100">
+    <div id="details-box" class="d-none row mx-5 justify-content-center w-100">
       <div class="col-lg-5 d-flex align-items-center flex-column">
         <hr class="w-75" />
         <h4>Details</h4>
-
-        <p>Singular Values</p>
-        <p>Original size in pixel values</p>
-        <p>Compressed size in pixel values</p>
-        <p>Pixels saved</p>
-        <p>Compression Ratio</p>
+        <p>When stored as a matrix, numers are approximately proportional</p>
+        <p>Singular Values: <span id="details-svs">300</span></p>
+        <p>Original size: <span id="details-o-size">500x400</span></p>
+        <p>Compressed size: <span id="details-n-size">3300-=-df</span></p>
+        <p>Compression Ratio: <span id="details-ratio">kibby</span></p>
       </div>
     </div>
     <div class="row px-5 justify-content-center w-100">
@@ -89,6 +88,12 @@
           approximation of rank k uses the product of an m x k matrix, k singular values, and a k x n matrix for each
           color channel, which can me stored as <b>3*(m*k + k + n*k)</b> values. For low values of k, this saves much
           more space in comparison to storing the full matrix, at the cost of image quality
+        </p>
+        <p>
+          Note that this application of the SVD assumes that color channel values are stored without any optimization.
+          This is largely agnostic to the reality of physical storage implementations. In addition,
+          the computation of an SVD is an expensive operation, making this method less practical, but still an interesting
+          exploration of the SVD's applications.
         </p>
       </div>
       <div class="col-lg-5 d-flex align-items-center flex-column">

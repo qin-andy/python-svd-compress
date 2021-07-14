@@ -41,7 +41,7 @@ def example(index):
         rgb = svd.get_reduced_image(svs);
         rgb_list = rgb.tolist()
         print("Request fulfilled")
-        return {"colors": rgb_list, "shape": rgb.shape}
+        return {"colors": rgb_list, "shape": rgb.shape, "svs": svs}
     else:
         return "Image not found!", 400
 
@@ -62,7 +62,7 @@ def upload():
         rgb = svd.get_reduced_image(svs)
         rgb_list = rgb.tolist()
         print("post result shape: " + str(rgb.shape))
-        return {"colors": rgb_list, "shape": rgb.shape}
+        return {"colors": rgb_list, "shape": rgb.shape, "svs": svs}
     else:
         return "<p>Image uploading endpoint</p>"
 

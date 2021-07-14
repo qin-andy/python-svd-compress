@@ -7,7 +7,7 @@ function init() {
   id("upload-btn").disabled = true;
   id("file-input").addEventListener("change", handleFileChange);
   id("image-upload").addEventListener("submit", handleSubmit);
-  id("sv-slider").addEventListener("change", handleSliderChange);
+  id("sv-slider").addEventListener("input", handleSliderChange);
   document.querySelectorAll(".gallery").forEach(element => element.addEventListener("click", () => {
     let index = element.id.split("-")[1];
     disableUiElements();
@@ -17,7 +17,10 @@ function init() {
     fetch("/svd/example/" + index + "?svs=" + svs)
       .then(statusCheck)
       .then(res => res.json())
-      .then((json) => renderRGBOnCanvas(json.colors, json.shape[0], json.shape[1]))
+      .then((json) => {
+        updateDetails(json.shape[1], json.shape[0], json.svs);
+        renderRGBOnCanvas(json.colors, json.shape[0], json.shape[1]);
+      })
       .catch(console.log)
       .finally(() => {
         id("upload-spinner").classList.add("d-none");
@@ -48,7 +51,9 @@ function handleSubmit(e) {
     fetch('/upload/image' + query, { method: "POST", body: formData })
       .then(statusCheck)
       .then(res => res.json())
-      .then((json) => renderRGBOnCanvas(json.colors, json.shape[0], json.shape[1]))
+      .then((json) => {
+        renderRGBOnCanvas(json.colors, json.shape[0], json.shape[1]);
+      })
       .catch(console.log)
       .finally(() => {
         id("upload-spinner").classList.add("d-none");
@@ -100,6 +105,16 @@ function renderRGBOnCanvas(rgb, height, width) {
     }
   }
   ctx.putImageData(imgData, 0, 0);
+}
+
+function updateDetails(width, height, svs) {
+  id("details-box").classList.remove("d-none");
+  id("details-svs").textContent = svs;
+  id("details-o-size").textContent = "3x" + width + "x" + height + " = "
+    + 3 * width * height + " values";
+  id("details-n-size").textContent = height + "x" + svs + " + " + svs + " + "
+    + svs + "x" + width + " = " + (height * svs + width * svs + svs) + " values";
+  id("details-ratio").textContent = (height * svs + width * svs + svs) / (3 * width * height);
 }
 
 function disableUiElements() {

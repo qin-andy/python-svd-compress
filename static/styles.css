@@ -19,7 +19,14 @@ body,html {
   pointer-events: auto;
 }
 
-
 .enabled:hover {
   transform: scale(1.05);
+}
+
+#details-box p {
+  margin: 0px;
+}
+
+#details-box span {
+  font-weight: bold;
 }
