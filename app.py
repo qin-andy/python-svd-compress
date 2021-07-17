@@ -1,6 +1,7 @@
 import time
+import uuid
 
-from PIL import Image
+from functools import wraps
 from flask import Flask, render_template, request, session
 import redis
 from markupsafe import escape
@@ -19,19 +20,21 @@ examples = [
     ImageSVD("static/images/shore.png")
 ]
 
-def get_hit_count():
-    retries = 5
-    while True:
-        try:
-            return cache.incr('hits')
-        except redis.exceptions.ConnectionError as exc:
-            if retries == 0:
-                raise exc
-            retries -= 1
-            time.sleep(0.5)
-
+def assign_session(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        user_id = session.get('user_id')
+        if user_id:
+            print("Session recognized: " + str(user_id))
+            return fn(*args, **kwargs)
+        else:
+            session['user_id'] = str(uuid.uuid4().hex)
+            print("Session unrecognized, assigning: " + str(user_id))
+            return fn(*args, **kwargs)
+    return wrapper
 
 @app.route("/")
+@assign_session
 def index():
     return render_template("index.html")
 
@@ -81,14 +84,20 @@ def upload():
     else:
         return "<p>Image uploading endpoint</p>"
 
+
 @app.route("/session")
+@assign_session
 def count():
+    user_id = session.get("user_id")
     if 'count' not in session:
         session['count'] = 0
     session['count'] += 1
-    return str(session['count'])
+    return str(session['count']) + " views from session: " + str(user_id) + ", stored: " + str(cache.get(user_id))
 
-@app.route("/redis/hits")
-def hits():
-    count = get_hit_count()
-    return 'Hello World! I have been seen {} times.\n'.format(count)
+
+@app.route("/session/store/<value>")
+@assign_session
+def redis_store_test(value):
+    user_id = session.get("user_id")
+    cache.set(user_id, value)
+    return "Stored " + str(value) + " in redis!"
