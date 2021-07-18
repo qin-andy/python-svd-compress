@@ -9,7 +9,7 @@ function init() {
   id("upload-btn").disabled = true;
   id("file-input").addEventListener("change", handleFileChange);
   id("image-upload").addEventListener("submit", handleSubmit);
-  
+
   id("sv-slider").addEventListener("input", handleSliderInput);
   id("sv-slider").addEventListener("change", handleSliderChange);
 
@@ -35,19 +35,7 @@ function handleSliderChange(e) {
     console.log("Recalculate request!")
     disableUiElements();
     id("upload-spinner").classList.remove("d-none");
-    fetch("/recalculate" + "?svs=" + e.target.value + "&selected=" + selected)
-      .then(statusCheck)
-      .then(res => res.json())
-      .then((json) => {
-        updateDetails(json.shape[1], json.shape[0], json.svs);
-        renderRGBOnCanvas(json.colors, json.shape[0], json.shape[1]);
-        calculated = true;
-      })
-      .catch(console.log)
-      .finally(() => {
-        id("upload-spinner").classList.add("d-none");
-        enableUiElements();
-      });
+    fetchRender("/recalculate" + "?svs=" + e.target.value + "&selected=" + selected);
   }
 }
 
@@ -67,35 +55,29 @@ function handleSubmit(e) {
     query = "?svs=" + id("sv-slider").value;
 
     // Make request
-    fetch('/upload/image' + query, { method: "POST", body: formData })
-      .then(statusCheck)
-      .then(res => res.json())
-      .then((json) => {
-        updateDetails(json.shape[1], json.shape[0], json.svs);
-        renderRGBOnCanvas(json.colors, json.shape[0], json.shape[1]);
-        calculated = true
-      })
-      .catch(console.log)
-      .finally(() => {
-        // Handle ui after request
-        id("upload-spinner").classList.add("d-none");
-        enableUiElements();
-      });
+    fetchRender('/upload/image' + query, { method: "POST", body: formData });
   } else {
-    fetch("/svd/example/" + selected + "?svs=" + id("sv-slider").value)
-      .then(statusCheck)
-      .then(res => res.json())
-      .then((json) => {
-        updateDetails(json.shape[1], json.shape[0], json.svs);
-        renderRGBOnCanvas(json.colors, json.shape[0], json.shape[1]);
-        calculated = true;
-      })
-      .catch(console.log)
-      .finally(() => {
-        id("upload-spinner").classList.add("d-none");
-        enableUiElements();
-      });
+    let url = "/svd/example/" + selected + "?svs=" + id("sv-slider").value;
+    fetchRender(url);
   }
+}
+
+function fetchRender(url, options) {
+  disableUiElements();
+  id("upload-spinner").classList.remove("d-none");
+  fetch(url, options)
+    .then(statusCheck)
+    .then(res => res.json())
+    .then((json) => {
+      updateDetails(json.shape[1], json.shape[0], json.svs);
+      renderRGBOnCanvas(json.colors, json.shape[0], json.shape[1]);
+      calculated = true;
+    })
+    .catch(console.log)
+    .finally(() => {
+      id("upload-spinner").classList.add("d-none");
+      enableUiElements();
+    });
 }
 
 function getCanvasData() {
