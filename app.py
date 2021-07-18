@@ -15,28 +15,28 @@ cache = redis.Redis(host='redis', port=6379)
 secret_file = open("secret_key.txt");
 app.secret_key = secret_file.read()
 
-svds =[
-    ImageSVD("static/images/bridge.png"),
-    ImageSVD("static/images/city.png"),
-    ImageSVD("static/images/horizon.png"),
-    ImageSVD("static/images/shore.png")
-]
+# svds =[
+#     ImageSVD("static/images/bridge.png"),
+#     ImageSVD("static/images/city.png"),
+#     ImageSVD("static/images/horizon.png"),
+#     ImageSVD("static/images/shore.png")
+# ]
 
-examples = [
-    pickle.dumps(svds[0]),
-    pickle.dumps(svds[1]),
-    pickle.dumps(svds[2]),
-    pickle.dumps(svds[3])
-]
+# examples = [
+#     pickle.dumps(svds[0]),
+#     pickle.dumps(svds[1]),
+#     pickle.dumps(svds[2]),
+#     pickle.dumps(svds[3])
+# ]
 
-cache.set("ex0", examples[0])
-cache.set("ex1", examples[1])
-cache.set("ex2", examples[2])
-cache.set("ex3", examples[3])
+# cache.set("ex0", examples[0])
+# cache.set("ex1", examples[1])
+# cache.set("ex2", examples[2])
+# cache.set("ex3", examples[3])
 
-del svds
-del examples
-gc.collect()
+# del svds
+# del examples
+# gc.collect()
 
 
 def assign_session(fn):
@@ -79,7 +79,8 @@ def example(index):
             return "Singular values cannot exceed image size: " + str(svd.width) + "x" + str(svd.height), 400
         rgb = svd.get_reduced_image(svs);
         rgb_list = rgb.tolist()
-        print("Request fulfilled")
+
+        session['current'] = "ex" + str(index)
         return {"colors": rgb_list, "shape": rgb.shape, "svs": svs}
     else:
         return "Image not found!", 400
@@ -101,9 +102,34 @@ def upload():
         rgb = svd.get_reduced_image(svs)
         rgb_list = rgb.tolist()
         print("post result shape: " + str(rgb.shape))
+        session['current'] = "custom"
         return {"colors": rgb_list, "shape": rgb.shape, "svs": svs}
     else:
         return "<p>Image uploading endpoint</p>"
+
+
+@app.route("/recalculate")
+@assign_session
+def recalculate_product():
+    svs = request.args.get("svs");
+    selected = request.args.get("selected")
+
+    if svs == None:
+        svs = 10
+    elif not svs.isnumeric():
+        return "Invalid singular values count!", 400
+    svs = int(svs)
+
+    if session.get("current") == "custom":
+        return "TBI!"
+    else:
+        serialized_image_svd = cache.get("ex" + selected)
+        svd = pickle.loads(serialized_image_svd)
+        if svs > min(svd.width, svd.height):
+            return "Singular values cannot exceed image size: " + str(svd.width) + "x" + str(svd.height), 400
+        rgb = svd.get_reduced_image(svs);
+        rgb_list = rgb.tolist()
+        return {"colors": rgb_list, "shape": rgb.shape, "svs": svs}
 
 
 @app.route("/session")

@@ -1,78 +1,123 @@
 window.addEventListener("load", init);
 
 const order = ["bridge", "city", "horizon", "shore"];
+let selected = "";
+let calculated = false;
 
 function init() {
   console.log("Window loaded!");
   id("upload-btn").disabled = true;
   id("file-input").addEventListener("change", handleFileChange);
   id("image-upload").addEventListener("submit", handleSubmit);
-  id("sv-slider").addEventListener("input", handleSliderChange);
-  document.querySelectorAll(".gallery").forEach(element => element.addEventListener("click", () => {
-    let index = element.id.split("-")[1];
+  
+  id("sv-slider").addEventListener("input", handleSliderInput);
+  id("sv-slider").addEventListener("change", handleSliderChange);
+
+  // Add listeners for gallery images
+  document.querySelectorAll(".gallery").forEach(element => element.addEventListener("click", (e) => {
+    selected = e.target.id.split("-")[1];
+    let newImg = new Image();
+    newImg.src = e.target.src;
+    newImg.addEventListener("load", () => {
+      calculated = false;
+      renderImageOnCanvas(newImg);
+      id("upload-btn").disabled = false;
+    });
+  }));
+}
+
+function handleSliderInput(e) {
+  id("sv-display").textContent = e.target.value;
+}
+
+function handleSliderChange(e) {
+  if (calculated) {
+    console.log("Recalculate request!")
     disableUiElements();
     id("upload-spinner").classList.remove("d-none");
-    let svs = id("sv-slider").value;
-    console.log(svs)
-    fetch("/svd/example/" + index + "?svs=" + svs)
+    fetch("/recalculate" + "?svs=" + e.target.value + "&selected=" + selected)
       .then(statusCheck)
       .then(res => res.json())
       .then((json) => {
         updateDetails(json.shape[1], json.shape[0], json.svs);
         renderRGBOnCanvas(json.colors, json.shape[0], json.shape[1]);
+        calculated = true;
       })
       .catch(console.log)
       .finally(() => {
         id("upload-spinner").classList.add("d-none");
         enableUiElements();
       });
-  }));
-}
-
-function handleSliderChange(e) {
-  id("sv-display").textContent = e.target.value;
+  }
 }
 
 function handleSubmit(e) {
   e.preventDefault();
+
+  // Handle Ui
   disableUiElements();
   id("upload-spinner").classList.remove("d-none");
-  let file = id("file-input").files[0];
-  if (file) {
-    let canvas = id("canvas");
-    let ctx = canvas.getContext("2d");
-    let imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+  if (selected === "custom") {
+    // Append data
     let formData = new FormData();
-    formData.append("data", imgData.data);
+    formData.append("data", getCanvasData().data);
     formData.append("width", canvas.width);
     formData.append("height", canvas.height);
     query = "?svs=" + id("sv-slider").value;
 
+    // Make request
     fetch('/upload/image' + query, { method: "POST", body: formData })
       .then(statusCheck)
       .then(res => res.json())
       .then((json) => {
+        updateDetails(json.shape[1], json.shape[0], json.svs);
         renderRGBOnCanvas(json.colors, json.shape[0], json.shape[1]);
+        calculated = true
+      })
+      .catch(console.log)
+      .finally(() => {
+        // Handle ui after request
+        id("upload-spinner").classList.add("d-none");
+        enableUiElements();
+      });
+  } else {
+    fetch("/svd/example/" + selected + "?svs=" + id("sv-slider").value)
+      .then(statusCheck)
+      .then(res => res.json())
+      .then((json) => {
+        updateDetails(json.shape[1], json.shape[0], json.svs);
+        renderRGBOnCanvas(json.colors, json.shape[0], json.shape[1]);
+        calculated = true;
       })
       .catch(console.log)
       .finally(() => {
         id("upload-spinner").classList.add("d-none");
         enableUiElements();
       });
-  } else {
-    console.log("Missing file!");
   }
 }
 
+function getCanvasData() {
+  let ctx = id("canvas").getContext("2d");
+  return ctx.getImageData(0, 0, canvas.width, canvas.height);
+}
+
 function handleFileChange(e) {
+  calculated = false;
   let label = id("file-label");
-  if (this.files.length >= 1) {
+  if (this.files.length == 1) { // If there is a file selected
     id("upload-btn").disabled = false;
+
+    // Render Image on Canvas
     label.textContent = this.files[0].name;
     let img = new Image();
     img.src = URL.createObjectURL(this.files[0]);
     img.addEventListener("load", () => renderImageOnCanvas(img));
-  } else {
+
+    // Set selected
+    selected = "custom";
+  } else { // No file selected
     id("upload-btn").disabled = true;
     label.textContent = "Choose file";
   }
