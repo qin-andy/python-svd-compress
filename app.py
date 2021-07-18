@@ -1,12 +1,10 @@
+import time
 import uuid
-import pickle
-import redis
-import gc
 
 from functools import wraps
 from flask import Flask, render_template, request, session
+import redis
 from markupsafe import escape
-
 from ImageSVD import ImageSVD
 
 
@@ -15,29 +13,12 @@ cache = redis.Redis(host='redis', port=6379)
 secret_file = open("secret_key.txt");
 app.secret_key = secret_file.read()
 
-svds =[
+examples = [
     ImageSVD("static/images/bridge.png"),
     ImageSVD("static/images/city.png"),
     ImageSVD("static/images/horizon.png"),
     ImageSVD("static/images/shore.png")
 ]
-
-examples = [
-    pickle.dumps(svds[0]),
-    pickle.dumps(svds[1]),
-    pickle.dumps(svds[2]),
-    pickle.dumps(svds[3])
-]
-
-cache.set("ex0", examples[0])
-cache.set("ex1", examples[1])
-cache.set("ex2", examples[2])
-cache.set("ex3", examples[3])
-
-del svds
-del examples
-gc.collect()
-
 
 def assign_session(fn):
     @wraps(fn)
@@ -51,7 +32,6 @@ def assign_session(fn):
             print("Session unrecognized, assigning: " + str(user_id))
             return fn(*args, **kwargs)
     return wrapper
-
 
 @app.route("/")
 @assign_session
@@ -72,9 +52,8 @@ def example(index):
         return "Invalid index!", 400
 
     index = int(index)
-    if (index >= 0) and (index < 4):
-        serialized_image_svd = cache.get("ex" + str(index))
-        svd = pickle.loads(serialized_image_svd)
+    if (index >= 0) and (index < len(examples)):
+        svd = examples[index]
         if svs > min(svd.width, svd.height):
             return "Singular values cannot exceed image size: " + str(svd.width) + "x" + str(svd.height), 400
         rgb = svd.get_reduced_image(svs);
