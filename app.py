@@ -15,29 +15,30 @@ cache = redis.Redis(host='redis', port=6379)
 secret_file = open("secret_key.txt");
 app.secret_key = secret_file.read()
 
-# svds =[
-#     ImageSVD("static/images/bridge.png"),
-#     ImageSVD("static/images/city.png"),
-#     ImageSVD("static/images/horizon.png"),
-#     ImageSVD("static/images/shore.png")
-# ]
+svds =[
+    ImageSVD("static/images/bridge.png"),
+    ImageSVD("static/images/city.png"),
+    ImageSVD("static/images/horizon.png"),
+    ImageSVD("static/images/shore.png")
+]
 
-# examples = [
-#     pickle.dumps(svds[0]),
-#     pickle.dumps(svds[1]),
-#     pickle.dumps(svds[2]),
-#     pickle.dumps(svds[3])
-# ]
+examples = [
+    pickle.dumps(svds[0]),
+    pickle.dumps(svds[1]),
+    pickle.dumps(svds[2]),
+    pickle.dumps(svds[3])
+]
 
-# cache.set("ex0", examples[0])
-# cache.set("ex1", examples[1])
-# cache.set("ex2", examples[2])
-# cache.set("ex3", examples[3])
+cache.set("ex0", examples[0])
+cache.set("ex1", examples[1])
+cache.set("ex2", examples[2])
+cache.set("ex3", examples[3])
 
-# del svds
-# del examples
-# gc.collect()
+del svds
+del examples
+gc.collect()
 
+expiration_time = 60
 
 def assign_session(fn):
     @wraps(fn)
@@ -53,6 +54,14 @@ def assign_session(fn):
     return wrapper
 
 
+def buildSVDJson(svd, svs):
+    if svs > min(svd.width, svd.height):
+        return "Singular values cannot exceed image size: " + str(svd.width) + "x" + str(svd.height), 400
+    rgb = svd.get_reduced_image(svs);
+    rgb_list = rgb.tolist()
+    return {"colors": rgb_list, "shape": rgb.shape, "svs": svs}, 200
+
+
 @app.route("/")
 @assign_session
 def index():
@@ -60,6 +69,7 @@ def index():
 
 
 @app.route("/svd/example/<index>")
+@assign_session
 def example(index):
     svs = request.args.get("svs");
     if svs == None:
@@ -75,13 +85,11 @@ def example(index):
     if (index >= 0) and (index < 4):
         serialized_image_svd = cache.get("ex" + str(index))
         svd = pickle.loads(serialized_image_svd)
-        if svs > min(svd.width, svd.height):
-            return "Singular values cannot exceed image size: " + str(svd.width) + "x" + str(svd.height), 400
-        rgb = svd.get_reduced_image(svs);
-        rgb_list = rgb.tolist()
+        
 
         session['current'] = "ex" + str(index)
-        return {"colors": rgb_list, "shape": rgb.shape, "svs": svs}
+        res, code = buildSVDJson(svd, svs)
+        return res, code
     else:
         return "Image not found!", 400
 
@@ -99,11 +107,13 @@ def upload():
         data = request.form
         arr = data["data"].split(",")
         svd = ImageSVD(arr, int(data["width"]), int(data["height"]))
-        rgb = svd.get_reduced_image(svs)
-        rgb_list = rgb.tolist()
-        print("post result shape: " + str(rgb.shape))
+
         session['current'] = "custom"
-        return {"colors": rgb_list, "shape": rgb.shape, "svs": svs}
+        cache.set(session.get("user_id"), pickle.dumps(svd))
+        cache.expire(session.get("user_id"), expiration_time)
+
+        res, code = buildSVDJson(svd, svs)
+        return res, code
     else:
         return "<p>Image uploading endpoint</p>"
 
@@ -120,16 +130,18 @@ def recalculate_product():
         return "Invalid singular values count!", 400
     svs = int(svs)
 
+    svd = None
+
     if session.get("current") == "custom":
-        return "TBI!"
+        serialized_image_svd = cache.get(session.get("user_id"))
+        if not serialized_image_svd:
+            return "Session timed out", 400
+        svd = pickle.loads(serialized_image_svd)
     else:
         serialized_image_svd = cache.get("ex" + selected)
         svd = pickle.loads(serialized_image_svd)
-        if svs > min(svd.width, svd.height):
-            return "Singular values cannot exceed image size: " + str(svd.width) + "x" + str(svd.height), 400
-        rgb = svd.get_reduced_image(svs);
-        rgb_list = rgb.tolist()
-        return {"colors": rgb_list, "shape": rgb.shape, "svs": svs}
+    res, code = buildSVDJson(svd, svs)
+    return res, code
 
 
 @app.route("/session")
