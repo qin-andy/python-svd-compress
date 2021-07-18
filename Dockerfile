@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 FROM python:3.8-slim-buster
 WORKDIR /code
-ENV FLASK_APP=app.py
+ENV FLASK_APP=application
 ENV FLASK_RUN_HOST=0.0.0.0
 RUN pip install -U pip
 COPY requirements.txt requirements.txt

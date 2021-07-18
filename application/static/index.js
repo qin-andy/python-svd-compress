@@ -35,7 +35,6 @@ function handleSliderInput(e) {
 
 function handleSliderChange(e) {
   if (calculated) {
-    console.log("Recalculate request!")
     disableUiElements();
     id("upload-spinner").classList.remove("d-none");
     fetchRender("/recalculate" + "?svs=" + e.target.value + "&selected=" + selected);
@@ -96,7 +95,7 @@ function fetchRender(url, options) {
       renderRGBOnCanvas(json.colors, json.shape[0], json.shape[1]);
       calculated = true;
     })
-    .catch(console.log)
+    .catch(handleError)
     .finally(() => {
       id("upload-spinner").classList.add("d-none");
       enableUiElements();
@@ -152,7 +151,7 @@ function disableUiElements() {
   id("file-input").disabled = true;
   id("upload-btn").disabled = true;
   document.querySelectorAll(".gallery").forEach(element => {
-    element.classList.remove("enabled")
+    element.classList.remove("enabled");
   });
 }
 
@@ -160,8 +159,12 @@ function enableUiElements() {
   id("sv-slider").disabled = false;
   id("file-input").disabled = false;
   document.querySelectorAll(".gallery").forEach(element => {
-    element.classList.add("enabled")
+    element.classList.add("enabled");
   });
+}
+
+function handleError(err) {
+  console.log(err);
 }
 
 async function statusCheck(response) {
