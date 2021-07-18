@@ -5,7 +5,6 @@ body,html {
 .gallery {
   height: 6rem;
   width: 10rem;
-  object-fit: cover;
   opacity: 0.4;
   filter: alpha(opacity=40);
   pointer-events: none;

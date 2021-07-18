@@ -15,28 +15,28 @@ cache = redis.Redis(host='redis', port=6379)
 secret_file = open("secret_key.txt");
 app.secret_key = secret_file.read()
 
-svds =[
-    ImageSVD("static/images/bridge.png"),
-    ImageSVD("static/images/city.png"),
-    ImageSVD("static/images/horizon.png"),
-    ImageSVD("static/images/shore.png")
-]
+# svds =[
+#     ImageSVD("static/images/bridge.png"),
+#     ImageSVD("static/images/city.png"),
+#     ImageSVD("static/images/horizon.png"),
+#     ImageSVD("static/images/shore.png")
+# ]
 
-examples = [
-    pickle.dumps(svds[0]),
-    pickle.dumps(svds[1]),
-    pickle.dumps(svds[2]),
-    pickle.dumps(svds[3])
-]
+# examples = [
+#     pickle.dumps(svds[0]),
+#     pickle.dumps(svds[1]),
+#     pickle.dumps(svds[2]),
+#     pickle.dumps(svds[3])
+# ]
 
-cache.set("ex0", examples[0])
-cache.set("ex1", examples[1])
-cache.set("ex2", examples[2])
-cache.set("ex3", examples[3])
+# cache.set("ex0", examples[0])
+# cache.set("ex1", examples[1])
+# cache.set("ex2", examples[2])
+# cache.set("ex3", examples[3])
 
-del svds
-del examples
-gc.collect()
+# del svds
+# del examples
+# gc.collect()
 
 expiration_time = 60
 

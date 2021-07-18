@@ -54,7 +54,7 @@
       <div class="col-lg-5 d-flex align-items-center flex-column">
         <hr class="w-75" />
         <h4>Details</h4>
-        <p>When stored as a matrix, numers are approximately proportional</p>
+        <p>When stored as a matrix, space stored is approximately proportional to</p>
         <p>Singular Values: <span id="details-svs">300</span></p>
         <p>Original size: <span id="details-o-size">500x400</span></p>
         <p>Compressed size: <span id="details-n-size">3300-=-df</span></p>
@@ -83,11 +83,11 @@
           By decomposing an image into its 3 color channels, we can represent an image as 3 separate matricies
           of the form M = UΣV*. In this sense,
           After constructing an SVD for each channel, the image can be "compressed" by calculating a low rank
-          approximation for each color using their singular values. A normal image represented by an m x k matrix
+          approximation for each color. Each image represented by an m x k matrix
           stores <b>3*m*n</b> different values, one for each pixel, to resconstruct the matrix; however, the low rank
           approximation of rank k uses the product of an m x k matrix, k singular values, and a k x n matrix for each
-          color channel, which can me stored as <b>3*(m*k + k + n*k)</b> values. For low values of k, this saves much
-          more space in comparison to storing the full matrix, at the cost of image quality
+          color channel, which can me stored as <b>3*(m*k + k + n*k)</b> values. For low values of k, this saves space
+           at the cost of image quality. The slider determines the rank of the low rank approximation
         </p>
         <p>
           Note that this application of the SVD assumes that color channel values are stored without any optimization.

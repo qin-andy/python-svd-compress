@@ -1,6 +1,5 @@
 window.addEventListener("load", init);
 
-const order = ["bridge", "city", "horizon", "shore"];
 let selected = "";
 let calculated = false;
 
@@ -14,16 +13,20 @@ function init() {
   id("sv-slider").addEventListener("change", handleSliderChange);
 
   // Add listeners for gallery images
-  document.querySelectorAll(".gallery").forEach(element => element.addEventListener("click", (e) => {
-    selected = e.target.id.split("-")[1];
-    let newImg = new Image();
-    newImg.src = e.target.src;
-    newImg.addEventListener("load", () => {
-      calculated = false;
-      renderImageOnCanvas(newImg);
-      id("upload-btn").disabled = false;
-    });
-  }));
+  document.querySelectorAll(".gallery").forEach(element => {
+    element.addEventListener("click", handleExampleClick);
+  });
+}
+
+function handleExampleClick(e) {
+  selected = e.target.id.split("-")[1];
+  let newImg = new Image();
+  newImg.src = e.target.src;
+  newImg.addEventListener("load", () => {
+    calculated = false;
+    renderImageOnCanvas(newImg);
+    id("upload-btn").disabled = false;
+  });
 }
 
 function handleSliderInput(e) {
@@ -62,6 +65,26 @@ function handleSubmit(e) {
   }
 }
 
+function handleFileChange(e) {
+  calculated = false;
+  let label = id("file-label");
+  if (this.files.length == 1) { // If there is a file selected
+    id("upload-btn").disabled = false;
+
+    // Render Image on Canvas
+    label.textContent = this.files[0].name;
+    let img = new Image();
+    img.src = URL.createObjectURL(this.files[0]);
+    img.addEventListener("load", () => renderImageOnCanvas(img));
+
+    // Set selected
+    selected = "custom";
+  } else { // No file selected
+    id("upload-btn").disabled = true;
+    label.textContent = "Choose file";
+  }
+}
+
 function fetchRender(url, options) {
   disableUiElements();
   id("upload-spinner").classList.remove("d-none");
@@ -83,26 +106,6 @@ function fetchRender(url, options) {
 function getCanvasData() {
   let ctx = id("canvas").getContext("2d");
   return ctx.getImageData(0, 0, canvas.width, canvas.height);
-}
-
-function handleFileChange(e) {
-  calculated = false;
-  let label = id("file-label");
-  if (this.files.length == 1) { // If there is a file selected
-    id("upload-btn").disabled = false;
-
-    // Render Image on Canvas
-    label.textContent = this.files[0].name;
-    let img = new Image();
-    img.src = URL.createObjectURL(this.files[0]);
-    img.addEventListener("load", () => renderImageOnCanvas(img));
-
-    // Set selected
-    selected = "custom";
-  } else { // No file selected
-    id("upload-btn").disabled = true;
-    label.textContent = "Choose file";
-  }
 }
 
 function renderImageOnCanvas(img) {
