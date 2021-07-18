@@ -2,22 +2,30 @@ window.addEventListener("load", init);
 
 const order = ["bridge", "city", "horizon", "shore"];
 
-let selected = "";
-
 function init() {
   console.log("Window loaded!");
   id("upload-btn").disabled = true;
   id("file-input").addEventListener("change", handleFileChange);
   id("image-upload").addEventListener("submit", handleSubmit);
   id("sv-slider").addEventListener("input", handleSliderChange);
-  document.querySelectorAll(".gallery").forEach(element => element.addEventListener("click", (e) => {
-    selected = e.target.id.split("-")[1];
-    let newImg = new Image();
-    newImg.src = e.target.src;
-    newImg.addEventListener("load", () => {
-      renderImageOnCanvas(newImg);
-      id("upload-btn").disabled = false;
-    });
+  document.querySelectorAll(".gallery").forEach(element => element.addEventListener("click", () => {
+    let index = element.id.split("-")[1];
+    disableUiElements();
+    id("upload-spinner").classList.remove("d-none");
+    let svs = id("sv-slider").value;
+    console.log(svs)
+    fetch("/svd/example/" + index + "?svs=" + svs)
+      .then(statusCheck)
+      .then(res => res.json())
+      .then((json) => {
+        updateDetails(json.shape[1], json.shape[0], json.svs);
+        renderRGBOnCanvas(json.colors, json.shape[0], json.shape[1]);
+      })
+      .catch(console.log)
+      .finally(() => {
+        id("upload-spinner").classList.add("d-none");
+        enableUiElements();
+      });
   }));
 }
 
@@ -27,10 +35,10 @@ function handleSliderChange(e) {
 
 function handleSubmit(e) {
   e.preventDefault();
-  if (selected) {
-    disableUiElements();
-
-    id("upload-spinner").classList.remove("d-none");
+  disableUiElements();
+  id("upload-spinner").classList.remove("d-none");
+  let file = id("file-input").files[0];
+  if (file) {
     let canvas = id("canvas");
     let ctx = canvas.getContext("2d");
     let imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
@@ -38,8 +46,7 @@ function handleSubmit(e) {
     formData.append("data", imgData.data);
     formData.append("width", canvas.width);
     formData.append("height", canvas.height);
-    let query = "?svs=" + id("sv-slider").value;
-    query += "&selected=" + selected;
+    query = "?svs=" + id("sv-slider").value;
 
     fetch('/upload/image' + query, { method: "POST", body: formData })
       .then(statusCheck)
@@ -47,19 +54,17 @@ function handleSubmit(e) {
       .then((json) => {
         renderRGBOnCanvas(json.colors, json.shape[0], json.shape[1]);
       })
-      .catch(handleError)
+      .catch(console.log)
       .finally(() => {
         id("upload-spinner").classList.add("d-none");
-        id("upload-btn").disabled = false;
         enableUiElements();
       });
   } else {
-    console.log("No image displayed!")
+    console.log("Missing file!");
   }
 }
 
 function handleFileChange(e) {
-  selected = "custom";
   let label = id("file-label");
   if (this.files.length >= 1) {
     id("upload-btn").disabled = false;
@@ -134,10 +139,6 @@ async function statusCheck(response) {
     throw new Error(await response.text());
   }
   return response;
-}
-
-function handleError(err) {
-  console.log(err);
 }
 
 function id(element) {
