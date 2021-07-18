@@ -79,7 +79,6 @@ def example(index):
             return "Singular values cannot exceed image size: " + str(svd.width) + "x" + str(svd.height), 400
         rgb = svd.get_reduced_image(svs);
         rgb_list = rgb.tolist()
-        print("Request fulfilled")
         return {"colors": rgb_list, "shape": rgb.shape, "svs": svs}
     else:
         return "Image not found!", 400
@@ -87,6 +86,10 @@ def example(index):
 
 @app.route("/upload/image", methods=['GET', 'POST'])
 def upload():
+    selected = request.args.get("selected");
+    if not selected:
+        return "No selected type!", 400
+
     svs = request.args.get("svs");
     if svs == None:
         svs = 10
@@ -95,12 +98,16 @@ def upload():
     svs = int(svs)
 
     if request.method == 'POST':
-        data = request.form
-        arr = data["data"].split(",")
-        svd = ImageSVD(arr, int(data["width"]), int(data["height"]))
+        svd = None
+        if selected == "custom":
+            data = request.form
+            arr = data["data"].split(",")
+            svd = ImageSVD(arr, int(data["width"]), int(data["height"]))
+        else:
+            serialized_image_svd = cache.get("ex" + selected)
+            svd = pickle.loads(serialized_image_svd)
         rgb = svd.get_reduced_image(svs)
         rgb_list = rgb.tolist()
-        print("post result shape: " + str(rgb.shape))
         return {"colors": rgb_list, "shape": rgb.shape, "svs": svs}
     else:
         return "<p>Image uploading endpoint</p>"
