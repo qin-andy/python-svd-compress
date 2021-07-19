@@ -3,6 +3,7 @@ import pickle
 import redis
 import os
 import gc
+import time
 
 from functools import wraps
 from flask import Flask, Blueprint, render_template, request, session
@@ -102,6 +103,7 @@ def index():
 
 @images.route("/upload/image", methods=['GET', 'POST'])
 def upload():
+    completeStart = time.time()
     svs = request.args.get("svs");
     if svs == None:
         svs = 10
@@ -114,11 +116,16 @@ def upload():
         arr = data["data"].split(",")
         svd = ImageSVD(arr, int(data["width"]), int(data["height"]))
 
+        start = time.time()
         session['current'] = "custom"
         cache.set(session.get("user_id"), pickle.dumps(svd))
         cache.expire(session.get("user_id"), EXPIRATION_TIME)
-
+        print("Storing Upload SVD in Redis: " + str(time.time() - start))
+        
+        start = time.time()
         res, code = buildSVDJson(svd, svs)
+        print("Building SVD Json: " + str(time.time() - start))
+        print("Complete upload time:: " + str(time.time() - completeStart))
         return res, code
     else:
         return "<p>Image uploading endpoint</p>"
@@ -127,6 +134,7 @@ def upload():
 @images.route("/recalculate")
 @assign_session
 def recalculate_product():
+    completeStart = time.time()
     svs = request.args.get("svs");
     selected = request.args.get("selected")
 
@@ -140,14 +148,19 @@ def recalculate_product():
 
     # if session.get("current") == "custom":
     try:
+        start = time.time()
         serialized_image_svd = cache.get(session.get("user_id"))
         svd = pickle.loads(serialized_image_svd)
+        print("Fetching svd from redis: " + str(time.time() - start))
     except:
         return "Session timed out! Try recalculating!", 408
     # else:
     #     serialized_image_svd = cache.get("ex" + selected)
     #     svd = pickle.loads(serialized_image_svd)
+    start = time.time()
     res, code = buildSVDJson(svd, svs)
+    print("Building SVD Json: " + str(time.time() - start))
+    print("Complete recalculate time:: " + str(time.time() - completeStart))
     return res, code
 
 

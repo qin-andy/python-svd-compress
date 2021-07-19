@@ -3,6 +3,7 @@ FROM python:3.8-slim-buster
 WORKDIR /code
 ENV FLASK_APP=application
 ENV FLASK_RUN_HOST=0.0.0.0
+ENV PYTHONUNBUFFERED=1
 ENV PORT=$PORT
 RUN pip install -U pip
 COPY requirements.txt requirements.txt
