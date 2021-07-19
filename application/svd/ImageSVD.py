@@ -1,6 +1,5 @@
 import numpy as np
 from PIL import Image
-import re
 import base64
 from io import BytesIO
 
@@ -9,6 +8,9 @@ from application.svd.ColorSVD import ColorSVD
 
 class ImageSVD:
     def __init__(self, data, type, width=0, height=0):
+        if isinstance(data, bytes):
+            print("its bytes!")
+
         if isinstance(data, list):
             im = np.array(data).astype(np.uint8)
             self.width, self.height = width, height
@@ -38,5 +40,3 @@ class ImageSVD:
         im.save(buffered, format="PNG")
         im_str = base64.b64encode(buffered.getvalue()).decode("ascii")
         return im_str
-
-        # return rgb2

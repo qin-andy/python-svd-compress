@@ -1,6 +1,5 @@
 window.addEventListener("load", init);
 
-let selected = "custom";
 let calculated = false;
 
 function init() {
@@ -19,7 +18,6 @@ function init() {
 }
 
 function handleExampleClick(e) {
-  selected = e.target.id.split("-")[1];
   let newImg = new Image();
   newImg.src = e.target.src;
   newImg.addEventListener("load", () => {
@@ -37,7 +35,7 @@ function handleSliderChange(e) {
   if (calculated) {
     disableUiElements();
     id("upload-spinner").classList.remove("d-none");
-    fetchRender("/recalculate" + "?svs=" + e.target.value + "&selected=" + selected);
+    fetchRender("/recalculate" + "?svs=" + e.target.value);
   }
 }
 
@@ -48,23 +46,16 @@ function handleSubmit(e) {
   disableUiElements();
   id("upload-spinner").classList.remove("d-none");
 
-  if (true) {
-    // Append data
-    let formData = new FormData();
-    // formData.append("data", getCanvasData().data);
+  // Append data
+  let formData = new FormData();
 
-    
-    formData.append("data64", id("canvas").toDataURL())
-    formData.append("width", canvas.width);
-    formData.append("height", canvas.height);
-    query = "?svs=" + id("sv-slider").value;
+  formData.append("data64", id("canvas").toDataURL())
+  formData.append("width", canvas.width);
+  formData.append("height", canvas.height);
+  query = "?svs=" + id("sv-slider").value;
 
-    // Make request
-    fetchRender('/upload/image' + query, { method: "POST", body: formData });
-  } else {
-    let url = "/svd/example/" + selected + "?svs=" + id("sv-slider").value;
-    fetchRender(url);
-  }
+  // Make request
+  fetchRender('/upload/image' + query, { method: "POST", body: formData });
 }
 
 function handleFileChange(e) {
@@ -78,9 +69,6 @@ function handleFileChange(e) {
     let img = new Image();
     img.src = URL.createObjectURL(this.files[0]);
     img.addEventListener("load", () => renderImageOnCanvas(img));
-
-    // Set selected
-    selected = "custom";
   } else { // No file selected
     id("upload-btn").disabled = true;
     label.textContent = "Choose file";
@@ -129,20 +117,6 @@ function renderRGBOnCanvas(rgb, height, width) {
     ctx.drawImage(img, 0, 0);
   });
   img.src = "data:image/png;base64," + rgb;
-
-  // let imgData = new ImageData(width, height);
-  // let data = imgData.data;
-  // let index = 0;
-  // for (let y = 0; y < height; y++) {
-  //   for (let x = 0; x < width; x++) {
-  //     index = (y * width + x) * 4
-  //     data[index] = rgb[y][x][0];
-  //     data[index + 1] = rgb[y][x][1];
-  //     data[index + 2] = rgb[y][x][2];
-  //     data[index + 3] = 255;
-  //   }
-  // }
-  // ctx.putImageData(imgData, 0, 0);
 }
 
 function updateDetails(width, height, svs) {

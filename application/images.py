@@ -2,12 +2,11 @@ import uuid
 import pickle
 import redis
 import os
-import gc
 import time
 import re
 
 from functools import wraps
-from flask import Flask, Blueprint, render_template, request, session
+from flask import Blueprint, render_template, request, session
 from markupsafe import escape
 
 from application.svd.ImageSVD import ImageSVD
@@ -25,30 +24,7 @@ else:
     cache = redis.from_url(url)
 
 
-# svds = [
-#     ImageSVD(os.path.abspath("application/static/images/bridge.png")),
-#     ImageSVD(os.path.abspath("application/static/images/city.png")),
-#     ImageSVD(os.path.abspath("application/static/images/horizon.png")),
-#     ImageSVD(os.path.abspath("application/static/images/shore.png"))
-# ]
-
-# examples = [
-#     pickle.dumps(svds[0]),
-#     pickle.dumps(svds[1]),
-#     pickle.dumps(svds[2]),
-#     pickle.dumps(svds[3])
-# ]
-
-# cache.set("ex0", examples[0])
-# cache.set("ex1", examples[1])
-# cache.set("ex2", examples[2])
-# cache.set("ex3", examples[3])
-
-# del svds
-# del examples
-# gc.collect()
-
-EXPIRATION_TIME = 180 # In seconds
+EXPIRATION_TIME = 300 # In seconds
 
 def assign_session(fn):
     @wraps(fn)
@@ -76,34 +52,9 @@ def index():
     return render_template("index.html")
 
 
-# @images.route("/svd/example/<index>")
-# @assign_session
-# def example(index):
-#     svs = request.args.get("svs");
-#     if svs == None:
-#         svs = 10
-#     elif not svs.isnumeric():
-#         return "Invalid singular values count!", 400
-#     svs = int(svs)
-
-#     if not index.isnumeric():
-#         return "Invalid index!", 400
-
-#     index = int(index)
-#     if (index >= 0) and (index < 4):
-#         serialized_image_svd = cache.get("ex" + str(index))
-#         svd = pickle.loads(serialized_image_svd)
-        
-
-#         session['current'] = "ex" + str(index)
-#         res, code = buildSVDJson(svd, svs)
-#         return res, code
-#     else:
-#         return "Image not found!", 400
-
-
 @images.route("/upload/image", methods=['GET', 'POST'])
 def upload():
+    print("Upload request receieved!")
     completeStart = time.time()
     svs = request.args.get("svs");
     if svs == None:
@@ -114,12 +65,9 @@ def upload():
 
     if request.method == 'POST':
         data = request.form
-        # arr = data["data"].split(",")
-        # svd = ImageSVD(arr, 0, int(data["width"]), int(data["height"]))
         svd = ImageSVD(re.sub('^data:image/.+;base64,', '', data['data64']), 64)
 
         start = time.time()
-        session['current'] = "custom"
         cache.set(session.get("user_id"), pickle.dumps(svd))
         cache.expire(session.get("user_id"), EXPIRATION_TIME)
         print("Storing Upload SVD in Redis: " + str(time.time() - start))
@@ -138,17 +86,14 @@ def upload():
 def recalculate_product():
     completeStart = time.time()
     svs = request.args.get("svs");
-    selected = request.args.get("selected")
 
     if svs == None:
         svs = 10
     elif not svs.isnumeric():
         return "Invalid singular values count!", 400
     svs = int(svs)
-
     svd = None
 
-    # if session.get("current") == "custom":
     try:
         start = time.time()
         serialized_image_svd = cache.get(session.get("user_id"))
@@ -156,9 +101,6 @@ def recalculate_product():
         print("Fetching svd from redis: " + str(time.time() - start))
     except:
         return "Session timed out! Try recalculating!", 408
-    # else:
-    #     serialized_image_svd = cache.get("ex" + selected)
-    #     svd = pickle.loads(serialized_image_svd)
     start = time.time()
     res, code = buildSVDJson(svd, svs)
     print("Building SVD Json: " + str(time.time() - start))
@@ -174,11 +116,3 @@ def count():
         session['count'] = 0
     session['count'] += 1
     return str(session['count']) + " views from session: " + str(user_id) + ", stored: " + str(cache.get(user_id))
-
-
-@images.route("/session/store/<value>")
-@assign_session
-def redis_store_test(value):
-    user_id = session.get("user_id")
-    cache.set(user_id, value)
-    return "Stored " + str(value) + " in redis!"
