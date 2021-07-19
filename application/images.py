@@ -4,6 +4,7 @@ import redis
 import os
 import gc
 import time
+import re
 
 from functools import wraps
 from flask import Flask, Blueprint, render_template, request, session
@@ -65,8 +66,8 @@ def buildSVDJson(svd, svs):
     if svs > min(svd.width, svd.height):
         return "Singular values cannot exceed image size: " + str(svd.width) + "x" + str(svd.height), 400
     rgb = svd.get_reduced_image(svs);
-    rgb_list = rgb.tolist()
-    return {"colors": rgb_list, "shape": rgb.shape, "svs": svs}, 200
+    # rgb_list = rgb.tolist()
+    return {"colors": str(rgb), "shape": (1, 1), "svs": svs}, 200
 
 
 @images.route("/")
@@ -113,8 +114,9 @@ def upload():
 
     if request.method == 'POST':
         data = request.form
-        arr = data["data"].split(",")
-        svd = ImageSVD(arr, int(data["width"]), int(data["height"]))
+        # arr = data["data"].split(",")
+        # svd = ImageSVD(arr, 0, int(data["width"]), int(data["height"]))
+        svd = ImageSVD(re.sub('^data:image/.+;base64,', '', data['data64']), 64)
 
         start = time.time()
         session['current'] = "custom"

@@ -51,7 +51,10 @@ function handleSubmit(e) {
   if (true) {
     // Append data
     let formData = new FormData();
-    formData.append("data", getCanvasData().data);
+    // formData.append("data", getCanvasData().data);
+
+    
+    formData.append("data64", id("canvas").toDataURL())
     formData.append("width", canvas.width);
     formData.append("height", canvas.height);
     query = "?svs=" + id("sv-slider").value;
@@ -118,22 +121,28 @@ function renderImageOnCanvas(img) {
 function renderRGBOnCanvas(rgb, height, width) {
   let canvas = id("canvas");
   let ctx = canvas.getContext("2d");
-  ctx.canvas.width = width;
-  ctx.canvas.height = height;
 
-  let imgData = new ImageData(width, height);
-  let data = imgData.data;
-  let index = 0;
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      index = (y * width + x) * 4
-      data[index] = rgb[y][x][0];
-      data[index + 1] = rgb[y][x][1];
-      data[index + 2] = rgb[y][x][2];
-      data[index + 3] = 255;
-    }
-  }
-  ctx.putImageData(imgData, 0, 0);
+  let img = new Image();
+  img.addEventListener("load", () => {
+    ctx.canvas.width = img.width;
+    ctx.canvas.height = img.height;
+    ctx.drawImage(img, 0, 0);
+  });
+  img.src = "data:image/png;base64," + rgb;
+
+  // let imgData = new ImageData(width, height);
+  // let data = imgData.data;
+  // let index = 0;
+  // for (let y = 0; y < height; y++) {
+  //   for (let x = 0; x < width; x++) {
+  //     index = (y * width + x) * 4
+  //     data[index] = rgb[y][x][0];
+  //     data[index + 1] = rgb[y][x][1];
+  //     data[index + 2] = rgb[y][x][2];
+  //     data[index + 3] = 255;
+  //   }
+  // }
+  // ctx.putImageData(imgData, 0, 0);
 }
 
 function updateDetails(width, height, svs) {
