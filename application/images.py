@@ -15,7 +15,7 @@ images = Blueprint('images',__name__,
             static_url_path='', 
             static_folder='static',
             template_folder='templates')
-cache = redis.Redis(host='redis', port=6379)
+cache = redis.from_url(os.environ.get("REDIS_URL"))
 
 
 svds = [
