@@ -15,31 +15,36 @@ images = Blueprint('images',__name__,
             static_url_path='', 
             static_folder='static',
             template_folder='templates')
-cache = redis.from_url(os.environ.get("REDIS_URL"))
+url = os.environ.get("REDIS_URL")
+cache = None
+if not url:
+    cache = redis.Redis(host='redis', port=6379)
+else:
+    cache = redis.from_url(url)
 
 
-svds = [
-    ImageSVD(os.path.abspath("application/static/images/bridge.png")),
-    ImageSVD(os.path.abspath("application/static/images/city.png")),
-    ImageSVD(os.path.abspath("application/static/images/horizon.png")),
-    ImageSVD(os.path.abspath("application/static/images/shore.png"))
-]
+# svds = [
+#     ImageSVD(os.path.abspath("application/static/images/bridge.png")),
+#     ImageSVD(os.path.abspath("application/static/images/city.png")),
+#     ImageSVD(os.path.abspath("application/static/images/horizon.png")),
+#     ImageSVD(os.path.abspath("application/static/images/shore.png"))
+# ]
 
-examples = [
-    pickle.dumps(svds[0]),
-    pickle.dumps(svds[1]),
-    pickle.dumps(svds[2]),
-    pickle.dumps(svds[3])
-]
+# examples = [
+#     pickle.dumps(svds[0]),
+#     pickle.dumps(svds[1]),
+#     pickle.dumps(svds[2]),
+#     pickle.dumps(svds[3])
+# ]
 
-cache.set("ex0", examples[0])
-cache.set("ex1", examples[1])
-cache.set("ex2", examples[2])
-cache.set("ex3", examples[3])
+# cache.set("ex0", examples[0])
+# cache.set("ex1", examples[1])
+# cache.set("ex2", examples[2])
+# cache.set("ex3", examples[3])
 
-del svds
-del examples
-gc.collect()
+# del svds
+# del examples
+# gc.collect()
 
 EXPIRATION_TIME = 180 # In seconds
 
@@ -69,30 +74,30 @@ def index():
     return render_template("index.html")
 
 
-@images.route("/svd/example/<index>")
-@assign_session
-def example(index):
-    svs = request.args.get("svs");
-    if svs == None:
-        svs = 10
-    elif not svs.isnumeric():
-        return "Invalid singular values count!", 400
-    svs = int(svs)
+# @images.route("/svd/example/<index>")
+# @assign_session
+# def example(index):
+#     svs = request.args.get("svs");
+#     if svs == None:
+#         svs = 10
+#     elif not svs.isnumeric():
+#         return "Invalid singular values count!", 400
+#     svs = int(svs)
 
-    if not index.isnumeric():
-        return "Invalid index!", 400
+#     if not index.isnumeric():
+#         return "Invalid index!", 400
 
-    index = int(index)
-    if (index >= 0) and (index < 4):
-        serialized_image_svd = cache.get("ex" + str(index))
-        svd = pickle.loads(serialized_image_svd)
+#     index = int(index)
+#     if (index >= 0) and (index < 4):
+#         serialized_image_svd = cache.get("ex" + str(index))
+#         svd = pickle.loads(serialized_image_svd)
         
 
-        session['current'] = "ex" + str(index)
-        res, code = buildSVDJson(svd, svs)
-        return res, code
-    else:
-        return "Image not found!", 400
+#         session['current'] = "ex" + str(index)
+#         res, code = buildSVDJson(svd, svs)
+#         return res, code
+#     else:
+#         return "Image not found!", 400
 
 
 @images.route("/upload/image", methods=['GET', 'POST'])
@@ -133,15 +138,15 @@ def recalculate_product():
 
     svd = None
 
-    if session.get("current") == "custom":
-        try:
-            serialized_image_svd = cache.get(session.get("user_id"))
-            svd = pickle.loads(serialized_image_svd)
-        except:
-            return "Session timed out! Try recalculating!", 408
-    else:
-        serialized_image_svd = cache.get("ex" + selected)
+    # if session.get("current") == "custom":
+    try:
+        serialized_image_svd = cache.get(session.get("user_id"))
         svd = pickle.loads(serialized_image_svd)
+    except:
+        return "Session timed out! Try recalculating!", 408
+    # else:
+    #     serialized_image_svd = cache.get("ex" + selected)
+    #     svd = pickle.loads(serialized_image_svd)
     res, code = buildSVDJson(svd, svs)
     return res, code
 

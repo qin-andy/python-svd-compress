@@ -1,6 +1,6 @@
 window.addEventListener("load", init);
 
-let selected = "";
+let selected = "custom";
 let calculated = false;
 
 function init() {
@@ -48,7 +48,7 @@ function handleSubmit(e) {
   disableUiElements();
   id("upload-spinner").classList.remove("d-none");
 
-  if (selected === "custom") {
+  if (true) {
     // Append data
     let formData = new FormData();
     formData.append("data", getCanvasData().data);
