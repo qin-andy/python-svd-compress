@@ -1,6 +1,6 @@
 function Canvas(props) {
   return (
-    <canvas class="shadow-lg" width={props.width} height={props.height} />
+    <canvas className="shadow-lg" width={props.width} height={props.height} />
   );
 }
 

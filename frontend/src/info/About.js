@@ -1,8 +1,8 @@
 function About(props) {
   return (
-    <div class="row px-5 justify-content-center w-100">
-      <div class="col-lg-5 d-flex align-items-center flex-column">
-        <p class="text-left">
+    <div className="row px-5 justify-content-center w-100">
+      <div className="col-lg-5 d-flex align-items-center flex-column">
+        <p className="text-left">
           An interactive demo showcasing how the singular value decomposition can be applied to image compression.
         </p>
         <p>
@@ -12,7 +12,7 @@ function About(props) {
           for a low rank approximation of A of by selecting the first k columns of U, entries of Σ, and rows of V*
           and multiplying them back together, resulting in an m x n matrix of rank k.
         </p>
-        <p class="text-left">
+        <p>
           By decomposing an image into its 3 color channels, we can represent an image as 3 separate matricies
           of the form M = UΣV*. In this sense,
           After constructing an SVD for each channel, the image can be "compressed" by calculating a low rank
@@ -29,10 +29,10 @@ function About(props) {
           exploration of the SVD's applications.
         </p>
       </div>
-      <div class="col-lg-5 d-flex align-items-center flex-column">
+      <div className="col-lg-5 d-flex align-items-center flex-column">
         <img
           src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Singular_value_decomposition_visualisation.svg/800px-Singular_value_decomposition_visualisation.svg.png"
-          alt="a diagram of an svd" class="img-fluid" />
+          alt="a diagram of an svd" className="img-fluid" />
         <cite>By Cmglee - Own work, CC BY-SA 4.0, https://commons.wikimedia.org/w/index.php?curid=67853297</cite>
       </div>
     </div>

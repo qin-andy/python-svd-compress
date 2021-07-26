@@ -1,8 +1,8 @@
 function Details(props) {
   return (
-    <div id="details-box" class="d-none row mx-5 justify-content-center w-100">
-      <div class="col d-flex align-items-center flex-column">
-        <hr class="w-75" />
+    <div id="details-box" className="d-none row mx-5 justify-content-center w-100">
+      <div className="col d-flex align-items-center flex-column">
+        <hr className="w-75" />
         <h4>Details</h4>
         <p>When stored as a matrix, space stored is approximately proportional to</p>
         <p>Singular Values: <span id="details-svs">300</span></p>
