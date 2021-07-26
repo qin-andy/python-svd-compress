@@ -7,6 +7,8 @@ import Gallery from "./Gallery";
 import GalleryImage from "./GalleryImage";
 import ValueSlider from "./ValueSlider";
 
+import { sendImage } from '../adapters/api';
+
 function Demo(props) {
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState(false);
@@ -25,16 +27,23 @@ function Demo(props) {
     setCanvasImage(img);
   }
 
-  function dummyUpload(query) {
+  function calculateSVD() {
     console.log("Dummy upload!");
     setSelected(false);
     setLoading(true);
     setCalculated(false);
-    setTimeout(() => {
-      setSelected(false);
-      setLoading(false);
-      setCalculated(true);
-    }, 500)
+    sendImage(canvasImage)
+      .then((img) => {
+        setCanvasImage(img);
+      })
+      .catch(err => {
+        console.log(err)
+      })
+      .finally(() => {
+        setSelected(false);
+        setLoading(false);
+        setCalculated(true);
+      });
   }
 
   function dummyRecalculate(value) {
@@ -67,7 +76,7 @@ function Demo(props) {
           fileDisabled={loading}
           loading={loading}
           onFileChange={dummyRenderImg}
-          onSubmit={dummyUpload}
+          onSubmit={calculateSVD}
         />
         <Details />
       </div>

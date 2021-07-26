@@ -53,6 +53,7 @@ def index():
 
 
 @images.route("/upload/image", methods=['GET', 'POST'])
+@assign_session
 def upload():
     print("Upload request receieved!")
     completeStart = time.time()
