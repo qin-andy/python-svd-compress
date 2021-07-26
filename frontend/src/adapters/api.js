@@ -1,4 +1,4 @@
-export async function sendImage(img) {
+export async function sendImage(img, value) {
   let formData = new FormData();
 
   let canvas = document.createElement("canvas");
@@ -8,14 +8,17 @@ export async function sendImage(img) {
   ctx.drawImage(img, 0, 0);
 
   formData.append("data64", canvas.toDataURL());
-  console.log(canvas.toDataURL());
   formData.append("width", canvas.width);
   formData.append("height", canvas.height);
-  let query = "?svs=" + 10;
+  let query = "?svs=" + value;
 
   // Make request
   let newImg = await toAPI('/upload/image' + query, { method: "POST", body: formData });
   return newImg
+}
+
+export async function recalculateImg(svs) {
+  return await toAPI("/recalculate?svs=" + svs);
 }
 
 async function toAPI(url, options) {
@@ -29,7 +32,6 @@ async function toAPI(url, options) {
     })
     .catch(handleError)
     .finally((img) => {
-      console.log("completed");
       return img || "error";
     });
 }

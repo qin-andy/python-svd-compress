@@ -1,22 +1,15 @@
-import { useState } from "react";
-
 function ValueSlider(props) {
-  const [value, setValue] = useState(10);
-  function handleChange(e) {
-    setValue(e.target.value);
-  }
-
   return (
     <div className="w-75 d-flex flex-column align-items-center">
-      <input type="range" value={value}
+      <input type="range" value={props.value}
         className="w-75"
         min="1"
         max="150"
-        onChange={handleChange}
+        onChange={props.handleChange}
         disabled={props.disabled}
-        onMouseUp={props.onMouseUp}
+        onMouseUp={props.onMouseUp ? (() => props.onMouseUp(props.value)) : null}
       />
-      <p id="sv-display" className="m-0">{value}</p>
+      <p id="sv-display" className="m-0">{props.value}</p>
     </div>
   );
 }

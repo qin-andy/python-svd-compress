@@ -7,7 +7,7 @@ import Gallery from "./Gallery";
 import GalleryImage from "./GalleryImage";
 import ValueSlider from "./ValueSlider";
 
-import { sendImage } from '../adapters/api';
+import { sendImage, recalculateImg } from '../adapters/api';
 
 function Demo(props) {
   const [loading, setLoading] = useState(false);
@@ -15,30 +15,24 @@ function Demo(props) {
   const [calculated, setCalculated] = useState(false);
 
   const [canvasImage, setCanvasImage] = useState(null);
+  const [sliderValue, setSliderValue] = useState(10);
 
-  function dummyRenderRGB(rgb) {
-    console.log(rgb);
-  }
 
-  function dummyRenderImg(img) {
-    console.log("Dummy rendering img!");
+  function renderNewImg(img) {
     setSelected(true);
     setCalculated(false);
     setCanvasImage(img);
   }
 
   function calculateSVD() {
-    console.log("Dummy upload!");
     setSelected(false);
     setLoading(true);
     setCalculated(false);
-    sendImage(canvasImage)
+    sendImage(canvasImage, sliderValue)
       .then((img) => {
         setCanvasImage(img);
       })
-      .catch(err => {
-        console.log(err)
-      })
+      .catch(handleErr)
       .finally(() => {
         setSelected(false);
         setLoading(false);
@@ -46,14 +40,27 @@ function Demo(props) {
       });
   }
 
-  function dummyRecalculate(value) {
-    console.log("Dummy recalculate!");
+  function recalculate(value) {
     setSelected(false);
     setLoading(true);
-    setTimeout(() => {
-      setSelected(false);
-      setLoading(false);
-    }, 500)
+
+    recalculateImg(value)
+      .then((img) => {
+        setCanvasImage(img);
+      })
+      .catch(handleErr)
+      .finally(() => {
+        setSelected(false);
+        setLoading(false);
+      });
+  }
+
+  function handleSliderChange(e) {
+    setSliderValue(e.target.value);
+  }
+
+  function handleErr(err) {
+    console.log(err);
   }
 
   return (
@@ -62,20 +69,25 @@ function Demo(props) {
         <h1 className="mt-3 mb-4 text-center">Web SVD Compress</h1>
         <Canvas id="canvas" width="600" height="400" img={canvasImage} />
         <Gallery>
-          <GalleryImage src="images/bridge.png" alt="Bridge" onClick={dummyRenderImg} disabled={loading} />
-          <GalleryImage src="images/city.png" alt="City" onClick={dummyRenderImg} disabled={loading} />
-          <GalleryImage src="images/horizon.png" alt="Horizon" onClick={dummyRenderImg} disabled={loading} />
-          <GalleryImage src="images/shore.png" alt="Shore" onClick={dummyRenderImg} disabled={loading} />
+          <GalleryImage src="images/bridge.png" alt="Bridge" onClick={renderNewImg} disabled={loading} />
+          <GalleryImage src="images/city.png" alt="City" onClick={renderNewImg} disabled={loading} />
+          <GalleryImage src="images/horizon.png" alt="Horizon" onClick={renderNewImg} disabled={loading} />
+          <GalleryImage src="images/shore.png" alt="Shore" onClick={renderNewImg} disabled={loading} />
         </Gallery>
         <h5 className="m-0">Singular Values</h5>
-        <ValueSlider disabled={!calculated} onMouseUp={dummyRecalculate} />
+        <ValueSlider
+          disabled={loading}
+          handleChange={handleSliderChange}
+          onMouseUp={calculated ? recalculate : null}
+          value={sliderValue}
+        />
         <hr className="w-75" />
         <h4>Custom Image</h4>
         <CalculateForm
           calcDisabled={!selected}
           fileDisabled={loading}
           loading={loading}
-          onFileChange={dummyRenderImg}
+          onFileChange={renderNewImg}
           onSubmit={calculateSVD}
         />
         <Details />
