@@ -1,6 +1,28 @@
+import { useEffect, useRef } from 'react';
+
 function Canvas(props) {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    let ctx = canvasRef.current.getContext('2d');
+    ctx.canvas.width = props.width;
+    ctx.canvas.height = props.height;
+  }, []);
+
+  useEffect(() => {
+    if (props.img) {
+      let ctx = canvasRef.current.getContext('2d');
+      ctx.canvas.width = props.img.width;
+      ctx.canvas.height = props.img.height;
+      ctx.drawImage(props.img, 0, 0);
+    }
+  }, [props.img]);
+
   return (
-    <canvas className="shadow-lg" width={props.width} height={props.height} />
+    <canvas
+      className="shadow-lg"
+      ref={canvasRef}
+    />
   );
 }
 

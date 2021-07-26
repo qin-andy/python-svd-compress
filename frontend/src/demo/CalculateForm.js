@@ -6,6 +6,9 @@ function CalculateForm(props) {
   function handleFileChange(e) {
     console.log("changed!");
     setFileName(e.target.files[0].name);
+    let img = new Image();
+    img.src = URL.createObjectURL(e.target.files[0]);
+    img.onload = () => props.onFileChange(img);
     console.log(e.target.files[0].name);
   }
 

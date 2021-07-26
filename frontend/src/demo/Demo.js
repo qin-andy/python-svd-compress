@@ -12,14 +12,17 @@ function Demo(props) {
   const [selected, setSelected] = useState(false);
   const [calculated, setCalculated] = useState(false);
 
+  const [canvasImage, setCanvasImage] = useState(null);
+
   function dummyRenderRGB(rgb) {
     console.log(rgb);
   }
 
-  function dummyRenderImg(src) {
+  function dummyRenderImg(img) {
     console.log("Dummy rendering img!");
     setSelected(true);
     setCalculated(false);
+    setCanvasImage(img);
   }
 
   function dummyUpload(query) {
@@ -48,7 +51,7 @@ function Demo(props) {
     <div className="row justify-content-center w-100">
       <div className="col d-flex align-items-center flex-column">
         <h1 className="mt-3 mb-4 text-center">Web SVD Compress</h1>
-        <Canvas id="canvas" width="600" height="400" />
+        <Canvas id="canvas" width="600" height="400" img={canvasImage} />
         <Gallery>
           <GalleryImage src="images/bridge.png" alt="Bridge" onClick={dummyRenderImg} disabled={loading} />
           <GalleryImage src="images/city.png" alt="City" onClick={dummyRenderImg} disabled={loading} />
