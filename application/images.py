@@ -66,7 +66,10 @@ def upload():
 
     if request.method == 'POST':
         data = request.form
-        svd = ImageSVD(re.sub('^data:image/.+;base64,', '', data['data64']), 64)
+        img_64 = re.sub('^data:image/.+;base64,', '', data['data64'])
+        if ((len(img_64) * 6) / 8000000) > 3:
+            return "File too large: " + str((len(img_64) * 6) / 8000000), 400
+        svd = ImageSVD(img_64, 64)
 
         start = time.time()
         cache.set(session.get("user_id"), pickle.dumps(svd))

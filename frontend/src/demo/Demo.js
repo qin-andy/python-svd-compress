@@ -89,6 +89,7 @@ function Demo(props) {
           loading={loading}
           onFileChange={renderNewImg}
           onSubmit={calculateSVD}
+          img={canvasImage}
         />
         <Details disabled={!calculated} width={canvasImage?.width} height={canvasImage?.height} svs={sliderValue}/>
       </div>

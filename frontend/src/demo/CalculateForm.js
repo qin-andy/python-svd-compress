@@ -2,19 +2,35 @@ import { useState } from "react";
 
 function CalculateForm(props) {
   const [fileName, setFileName] = useState(null);
+  const IMG_MAX_MB = 3
 
   function handleFileChange(e) {
     console.log("changed!");
     setFileName(e.target.files[0].name);
+
     let img = new Image();
     img.src = URL.createObjectURL(e.target.files[0]);
-    img.onload = () => props.onFileChange(img);
-    console.log(e.target.files[0].name);
+
+    img.onload = () => {
+      let canvas = document.createElement("canvas");
+      canvas.width = img.width;
+      canvas.height = img.height;
+      let ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      img.onload = () => props.onFileChange(img);
+      img.src = canvas.toDataURL();
+    }
   }
 
   function handleSubmit(e) {
     e.preventDefault();
-    props.onSubmit();
+    if ((props.img.src.length * 6 / 8000000 ) > IMG_MAX_MB) {
+      console.log("Approximately " + props.img.src.length * 6 / 8000000 + "mb");
+      console.log("File too large!")
+    } else {
+      console.log("Approximately " + props.img.src.length * 6 / 8000000 + "mb");
+      props.onSubmit();
+    }
   }
 
   return (

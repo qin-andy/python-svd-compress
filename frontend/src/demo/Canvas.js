@@ -15,6 +15,8 @@ function Canvas(props) {
       ctx.canvas.width = props.img.width;
       ctx.canvas.height = props.img.height;
       ctx.drawImage(props.img, 0, 0);
+
+      console.log("Approximately " + props.img.src.length * 6 / 8000000 + "mb");
     }
   }, [props.img]);
 
