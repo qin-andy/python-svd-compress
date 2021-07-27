@@ -14,7 +14,7 @@ function Demo(props) {
   const [selected, setSelected] = useState(false);
   const [calculated, setCalculated] = useState(false);
 
-  const [canvasImage, setCanvasImage] = useState(null);
+  const [canvasImage, setCanvasImage] = useState(undefined);
   const [sliderValue, setSliderValue] = useState(10);
 
 
@@ -90,7 +90,7 @@ function Demo(props) {
           onFileChange={renderNewImg}
           onSubmit={calculateSVD}
         />
-        <Details />
+        <Details disabled={!calculated} width={canvasImage?.width} height={canvasImage?.height} svs={sliderValue}/>
       </div>
     </div>
   );
