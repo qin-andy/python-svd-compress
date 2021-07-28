@@ -37,7 +37,7 @@ async function toAPI(url, options) {
 }
 
 function handleError(err) {
-  console.log(err);
+  throw Error(err);
 }
 
 async function statusCheck(response) {

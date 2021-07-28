@@ -8,6 +8,7 @@ import GalleryImage from "./GalleryImage";
 import ValueSlider from "./ValueSlider";
 
 import { sendImage, recalculateImg } from '../adapters/api';
+import Alert from './Alert';
 
 function Demo(props) {
   const [loading, setLoading] = useState(false);
@@ -16,6 +17,8 @@ function Demo(props) {
 
   const [canvasImage, setCanvasImage] = useState(undefined);
   const [sliderValue, setSliderValue] = useState(10);
+
+  const [error, setError] = useState();
 
 
   function renderNewImg(img) {
@@ -31,6 +34,7 @@ function Demo(props) {
     sendImage(canvasImage, sliderValue)
       .then((img) => {
         setCanvasImage(img);
+        setError(undefined);
       })
       .catch(handleErr)
       .finally(() => {
@@ -47,6 +51,7 @@ function Demo(props) {
     recalculateImg(value)
       .then((img) => {
         setCanvasImage(img);
+        setError(undefined);
       })
       .catch(handleErr)
       .finally(() => {
@@ -60,13 +65,20 @@ function Demo(props) {
   }
 
   function handleErr(err) {
+    setLoading(true);
+    console.log("Handling err!");
     console.log(err);
+    setError({
+      message: err.message,
+      code: err.code
+    });
   }
 
   return (
     <div className="row justify-content-center w-100">
       <div className="col d-flex align-items-center flex-column">
         <h1 className="mt-3 mb-4 text-center">Web SVD Compress</h1>
+        <Alert disabled={!error} errorMessage={error?.message} errorCode={error?.code} />
         <Canvas id="canvas" width="600" height="400" img={canvasImage} />
         <Gallery>
           <GalleryImage src="static/images/bridge.png" alt="Bridge" onClick={renderNewImg} disabled={loading} />
@@ -91,7 +103,7 @@ function Demo(props) {
           onSubmit={calculateSVD}
           img={canvasImage}
         />
-        <Details disabled={!calculated} width={canvasImage?.width} height={canvasImage?.height} svs={sliderValue}/>
+        <Details disabled={!calculated || loading} width={canvasImage?.width} height={canvasImage?.height} svs={sliderValue}/>
       </div>
     </div>
   );

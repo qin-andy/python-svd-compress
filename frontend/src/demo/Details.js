@@ -16,6 +16,8 @@ function Details(props) {
             + svs + "x" + width + " = " + (height * svs + width * svs + svs) + " values"}
         </span></p>
         <p>Compression Ratio: <span>{(height * svs + width * svs + svs) / (3 * width * height) + ""}</span></p>
+        <p>Note: physical storage implemenetations differ drastically from theoretical proportions!</p>
+        <p><span>For demonstration purposes primarily!</span></p>
       </div>
     </div>
   );

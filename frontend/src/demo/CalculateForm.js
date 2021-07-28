@@ -2,10 +2,9 @@ import { useState } from "react";
 
 function CalculateForm(props) {
   const [fileName, setFileName] = useState(null);
-  const IMG_MAX_MB = 3
+  const IMG_MAX_MB = 1203102
 
   function handleFileChange(e) {
-    console.log("changed!");
     setFileName(e.target.files[0].name);
 
     let img = new Image();
