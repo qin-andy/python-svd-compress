@@ -1,6 +1,5 @@
-import numpy as np
+import base64, numpy as np
 from PIL import Image
-import base64
 from io import BytesIO
 
 from application.svd.ColorSVD import ColorSVD

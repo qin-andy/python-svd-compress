@@ -1,20 +1,11 @@
-import uuid
-import pickle
-import redis
-import os
-import time
-import re
-
+import uuid, pickle, redis, os, time, re
 from functools import wraps
-from flask import Blueprint, render_template, request, session, Flask, send_from_directory
+from flask import Blueprint, request, session
 from markupsafe import escape
-
 from application.svd.ImageSVD import ImageSVD
 
 
-app = Flask(__name__,
-            static_url_path='/', 
-            static_folder='../frontend/build')
+api = Blueprint('api', __name__)
 url = os.environ.get("REDIS_URL")
 cache = None
 if not url:
@@ -22,11 +13,9 @@ if not url:
 else:
     cache = redis.from_url(url)
 
-secret_file = open("secret_key.txt")
-app.secret_key = secret_file.read()
-
 
 EXPIRATION_TIME = 300 # In seconds
+
 
 def assign_session(fn):
     @wraps(fn)
@@ -48,13 +37,7 @@ def buildSVDJson(svd, svs):
     return {"colors": str(rgb), "shape": (1, 1), "svs": svs}, 200
 
 
-@app.route("/")
-@assign_session
-def index():
-    return send_from_directory(app.static_folder, 'index.html')
-
-
-@app.route("/upload/image", methods=['GET', 'POST'])
+@api.route("/upload/image", methods=['GET', 'POST'])
 @assign_session
 def upload():
     print("Upload request receieved!")
@@ -87,7 +70,7 @@ def upload():
         return "<p>Image uploading endpoint</p>"
 
 
-@app.route("/recalculate")
+@api.route("/recalculate")
 @assign_session
 def recalculate_product():
     completeStart = time.time()
@@ -112,13 +95,3 @@ def recalculate_product():
     print("Building SVD Json: " + str(time.time() - start))
     print("Complete recalculate time:: " + str(time.time() - completeStart))
     return res, code
-
-
-@app.route("/session")
-@assign_session
-def count():
-    user_id = session.get("user_id")
-    if 'count' not in session:
-        session['count'] = 0
-    session['count'] += 1
-    return str(session['count']) + " views from session: " + str(user_id) + ", stored: " + str(cache.get(user_id))
