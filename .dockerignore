@@ -4,3 +4,9 @@ __pycache__
 .idea/
 .vscode
 node_modules
+
+build
+
+Dockerfile
+Dockerfile.dev
+Dockerfile.dev2

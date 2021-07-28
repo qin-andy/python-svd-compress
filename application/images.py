@@ -6,22 +6,24 @@ import time
 import re
 
 from functools import wraps
-from flask import Blueprint, render_template, request, session
+from flask import Blueprint, render_template, request, session, Flask, send_from_directory
 from markupsafe import escape
 
 from application.svd.ImageSVD import ImageSVD
 
 
-images = Blueprint('images',__name__,
-            static_url_path='', 
-            static_folder='static',
-            template_folder='templates')
+app = Flask(__name__,
+            static_url_path='/', 
+            static_folder='../frontend/build')
 url = os.environ.get("REDIS_URL")
 cache = None
 if not url:
     cache = redis.Redis(host='redis', port=6379)
 else:
     cache = redis.from_url(url)
+
+secret_file = open("secret_key.txt")
+app.secret_key = secret_file.read()
 
 
 EXPIRATION_TIME = 300 # In seconds
@@ -46,13 +48,13 @@ def buildSVDJson(svd, svs):
     return {"colors": str(rgb), "shape": (1, 1), "svs": svs}, 200
 
 
-@images.route("/")
+@app.route("/")
 @assign_session
 def index():
-    return render_template("index.html")
+    return send_from_directory(app.static_folder, 'index.html')
 
 
-@images.route("/upload/image", methods=['GET', 'POST'])
+@app.route("/upload/image", methods=['GET', 'POST'])
 @assign_session
 def upload():
     print("Upload request receieved!")
@@ -85,7 +87,7 @@ def upload():
         return "<p>Image uploading endpoint</p>"
 
 
-@images.route("/recalculate")
+@app.route("/recalculate")
 @assign_session
 def recalculate_product():
     completeStart = time.time()
@@ -112,7 +114,7 @@ def recalculate_product():
     return res, code
 
 
-@images.route("/session")
+@app.route("/session")
 @assign_session
 def count():
     user_id = session.get("user_id")

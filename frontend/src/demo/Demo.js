@@ -69,10 +69,10 @@ function Demo(props) {
         <h1 className="mt-3 mb-4 text-center">Web SVD Compress</h1>
         <Canvas id="canvas" width="600" height="400" img={canvasImage} />
         <Gallery>
-          <GalleryImage src="images/bridge.png" alt="Bridge" onClick={renderNewImg} disabled={loading} />
-          <GalleryImage src="images/city.png" alt="City" onClick={renderNewImg} disabled={loading} />
-          <GalleryImage src="images/horizon.png" alt="Horizon" onClick={renderNewImg} disabled={loading} />
-          <GalleryImage src="images/shore.png" alt="Shore" onClick={renderNewImg} disabled={loading} />
+          <GalleryImage src="static/images/bridge.png" alt="Bridge" onClick={renderNewImg} disabled={loading} />
+          <GalleryImage src="static/images/city.png" alt="City" onClick={renderNewImg} disabled={loading} />
+          <GalleryImage src="static/images/horizon.png" alt="Horizon" onClick={renderNewImg} disabled={loading} />
+          <GalleryImage src="static/images/shore.png" alt="Shore" onClick={renderNewImg} disabled={loading} />
         </Gallery>
         <h5 className="m-0">Singular Values</h5>
         <ValueSlider
