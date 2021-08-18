@@ -24,10 +24,11 @@ function CalculateForm(props) {
   function handleSubmit(e) {
     e.preventDefault();
     if ((props.img.src.length * 6 / 8000000 ) > IMG_MAX_MB) {
-      console.log("Approximately " + props.img.src.length * 6 / 8000000 + "mb");
-      console.log("File too large!")
+      props.setError({
+        message: 'File too large!',
+        code: '-1'
+      })
     } else {
-      console.log("Approximately " + props.img.src.length * 6 / 8000000 + "mb");
       props.onSubmit();
     }
   }

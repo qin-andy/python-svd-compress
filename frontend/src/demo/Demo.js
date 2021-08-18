@@ -66,7 +66,6 @@ function Demo(props) {
 
   function handleErr(err) {
     setLoading(true);
-    console.log("Handling err!");
     console.log(err);
     setError({
       message: err.message,
@@ -101,6 +100,7 @@ function Demo(props) {
           loading={loading}
           onFileChange={renderNewImg}
           onSubmit={calculateSVD}
+          setError={setError}
           img={canvasImage}
         />
         <Details disabled={!calculated || loading} width={canvasImage?.width} height={canvasImage?.height} svs={sliderValue}/>
