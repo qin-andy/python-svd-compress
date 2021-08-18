@@ -15,9 +15,13 @@ Built in **React**, **Flask**, and **Redis** and dockerized for development and 
   3. Run ``docker-compose up`` to set up Flask backend and Redis server on ``http://localhost:5000``
   4. Run ``cd frontend`` and ``yarn start`` for the React live development server on ``http://localhost:3000`` with requests proxied to the Flask backend
 
-Note that there are 2. ``Dockerfile`` with no extension is used for deployment on Heroku with a multistage build to serve
+With docker-compose, the Flask server is configured to start in development mode with live reload using docker volume mounts.
+
+Note that there are 2 dockerfiles, ``Dockerfile`` and ``Dockerfile.dev``. The ``Dockerfile`` with no extension is used for deployment on Heroku with a multistage build to serve
 the frontend as well as configured ports as environment variables, [as described in the Heroku documentation.](https://devcenter.heroku.com/articles/container-registry-and-runtime)
-``Dockerfile.dev`` can be used as an alternative to docker-compose, although the Redis server must be started separately.
+Do not use this one for local development. There are no volume mounts, so any code changes will require an entire image rebuild. Also, by default it will not run as the ports are not configured locally!
+
+``Dockerfile.dev`` can be used to expose the right ports locally and features volume mounts for the code as an alternative to docker-compose, although the Redis server must be started separately.
 
 ### Deployment
 A brief summary, see [the Heroku devcenter](https://devcenter.heroku.com/articles/container-registry-and-runtime) for more details. Assuming an
@@ -25,3 +29,28 @@ app has already been created:
   1. Run ``docker build -t svd-compress .`` to build the image from the Dockerfile at the root of the directory
   2. Run ``heroku container:login`` then ``heroku container:push web`` and wait for the image and container to build
   3. Run ``heroku container:release web`` to deploy and ``heroku logs --tail`` to monitor for any issues
+
+For Heroku, the Redis server is configured using the [Redis Addon for Heroku](https://elements.heroku.com/addons/heroku-redis) rather than seperately networked containers
+as recommended by the Heroku devcenter.
+
+## About This Project
+My goals for this project were to:
+  - Make an interesting math concept more accessible
+  - Design a fluid and responsive web experience with a well-designed user interface
+  - Step out of the JavaScript ecosystem and experiment with Python through Flask
+  - Explore a new database system through Redis
+  - Learn about developing with Docker and dockerization of existing applications
+
+
+### In terms of why I chose those specific technologies:
+  - Originally the frontend was written and completed in vanilla JavaScript, but I ended up rewriting it in React for my own sanity.
+My reasoning for using Flask over Node and Express which I felt more comfortable with was because of how straightforwards
+numpy made matrix manipulation. 
+  - Redis seemed like a very simple solution to the issue of how to cache large computed image SVDs.
+  - Since I've primarily developed on Windows up until this point, it seemed like a great opportunity to get my feet wet with Linux
+through WSL2, since Redis isn't supported on Windows. 
+  - While I was there, I also figured I might as well learn Docker since I had been reading about
+platform agnostic development and it sounded like something cool to explore. 
+  - In practice, using Docker for this project might have
+been overkill, especially since in deployment, the Redis server is accessed through the Heroku add-on rather than a separate container,
+but it was a great learning experience!
