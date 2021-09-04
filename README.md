@@ -11,11 +11,19 @@ Built in **React**, **Flask**, and **Redis** and dockerized for development and 
 ## Usage
 ### Setting up Local Development
   1. Run ``git clone`` to the directory of your choice
-  2. Ensure docker and docker-compose are installed
-  3. Run ``docker-compose up`` to set up Flask backend and Redis server on ``http://localhost:5000``
-  4. Run ``cd frontend`` and ``yarn start`` for the React live development server on ``http://localhost:3000`` with requests proxied to the Flask backend
+  2. Set up backend python environment 
+      1. From root, ``cd application``
+      2. Set up venv with ``python -m venv env`` and activate ``./env/Scripts/activate``
+      3. Install dependencies with ``pip install -r requirements.txt``
+      4. Create a ``secret_key.txt`` file in the application folder with a secure key
+  3. Setup React frontend with yarn
+      1. From root, ``cd frontend``
+      2. Install dependencies with ``yarn install``
+  5. Ensure docker and docker-compose are installed
+  6. From root, run ``docker-compose up`` to set up Flask backend and Redis server on ``http://localhost:5000``
+  7. Run ``cd frontend`` and ``yarn start`` for the React live development server on ``http://localhost:3000`` with requests proxied to the Flask backend
 
-With docker-compose, the Flask server is configured to start in development mode with live reload using docker volume mounts.
+With docker-compose, the Flask server is configured to start in development mode with live reload using docker volume mounted to the backend directory.
 
 Note that there are 2 dockerfiles, ``Dockerfile`` and ``Dockerfile.dev``. The ``Dockerfile`` with no extension is used for deployment on Heroku with a multistage build to serve
 the frontend as well as configured ports as environment variables, [as described in the Heroku documentation.](https://devcenter.heroku.com/articles/container-registry-and-runtime)
