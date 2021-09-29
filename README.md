@@ -1,8 +1,11 @@
 # [python-svd-compress](https://fierce-plateau-92798.herokuapp.com)
+<img src="https://github.com/qin-andy/python-web-svd-compress/blob/master/images/side_by_side%20svd.PNG" alt="a side by side comparison of the svd compress"><img>
+
 An interactive web demo of the singular value decomposition of a matrix applied to image compression.
 See website 'About the SVD' section for more details on the SVD itself.
 
 Built in **React**, **Flask**, and **Redis** and dockerized for development and deployment.
+
 ## Features
   - Serverside calculations and caching for clientside performance
   - Interactive singular value slider to visualize compression at differing levels
